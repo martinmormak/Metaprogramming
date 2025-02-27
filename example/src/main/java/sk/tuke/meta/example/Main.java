@@ -18,19 +18,22 @@ public class Main {
 
         manager.createTables(Person.class, Department.class);
 
-//        exampleOperations(manager);
+        exampleOperations(manager);
 
         conn.close();
     }
 
     private static void exampleOperations(PersistenceManager manager) {
-        Department development = new Department("Development", "DVLP");
-        manager.save(development);
+        System.out.println("Save Department");
+        Department department = new Department("department", "DVLP");
+        manager.save(department);
 
+        System.out.println("Save Hrasko");
         Person hrasko = new Person("Janko", "Hrasko", 30);
-        hrasko.setDepartment(development);
+        hrasko.setDepartment(department);
         manager.save(hrasko);
 
+        System.out.println("List All Persons");
         List<Person> persons = manager.getAll(Person.class);
         for (Person person : persons) {
             System.out.println(person);
@@ -38,5 +41,32 @@ public class Main {
         }
         Optional<Department> anotherDepartment = manager.get(Department.class, 100);
         System.out.println(anotherDepartment.isPresent());
+
+        System.out.println("Update Hrasko");
+        hrasko.setAge(40);
+        manager.save(hrasko);
+        persons = manager.getAll(Person.class);
+        for (Person person : persons) {
+            System.out.println(person);
+            System.out.println("  " + person.getDepartment());
+        }
+
+        System.out.println("Delete Department");
+        manager.delete(department);
+
+        persons = manager.getAll(Person.class);
+        for (Person person : persons) {
+            System.out.println(person);
+            System.out.println("  " + person.getDepartment());
+        }
+
+        System.out.println("Delete Hrasko");
+        manager.delete(hrasko);
+
+        persons = manager.getAll(Person.class);
+        for (Person person : persons) {
+            System.out.println(person);
+            System.out.println("  " + person.getDepartment());
+        }
     }
 }
