@@ -24,7 +24,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         for (DatabaseTable databaseTable : databaseTableList) {
             if (databaseTable.checkIfContainsSQLCommands()) {
                 databaseTableList.remove(databaseTable);
-                throw new PersistenceException("Table name, columns  names can't match SQL commands");
+                return;
             }
         }
 
@@ -49,7 +49,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         DatabaseTable databaseTable = getDatabaseTable(type);
 
         if (databaseTable.checkIfContainsSQLCommands()) {
-            throw new PersistenceException("Table name, columns names can't match SQL commands");
+            return Optional.empty();
         }
 
         String query = queryBuilder.getSelectOneQuery(databaseTable);
@@ -76,7 +76,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         DatabaseTable databaseTable = getDatabaseTable(type);
 
         if (databaseTable.checkIfContainsSQLCommands()) {
-            throw new PersistenceException("Table name, columns names can't match SQL commands");
+            return List.of();
         }
 
         String query = queryBuilder.getSelectAllQuery(databaseTable);
@@ -103,7 +103,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         DatabaseTable databaseTable = getDatabaseTable(entity.getClass());
 
         if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
-            throw new PersistenceException("Table name, columns, values names can't match SQL commands");
+            return;
         }
 
         long id = (long) tableReflection.getFieldValue(entity,databaseTable,"id");
@@ -135,7 +135,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         DatabaseTable databaseTable = getDatabaseTable(entity.getClass());
 
         if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
-            throw new PersistenceException("Table name, columns, values names can't match SQL commands");
+            return;
         }
 
         String deleteQuery = queryBuilder.getDeleteQuery(databaseTable);
