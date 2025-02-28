@@ -46,7 +46,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
     @Override
     public <T> Optional<T> get(Class<T> type, long id) {
-        DatabaseTable databaseTable = getDatabaseTable(type.getSimpleName());
+        DatabaseTable databaseTable = getDatabaseTable(type);
 
         if (databaseTable.checkIfContainsSQLCommands()) {
             throw new PersistenceException("Table name, columns names can't match SQL commands");
@@ -73,7 +73,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
     @Override
     public <T> List<T> getAll(Class<T> type) {
-        DatabaseTable databaseTable = getDatabaseTable(type.getSimpleName());
+        DatabaseTable databaseTable = getDatabaseTable(type);
 
         if (databaseTable.checkIfContainsSQLCommands()) {
             throw new PersistenceException("Table name, columns names can't match SQL commands");
@@ -100,7 +100,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
     @Override
     public <T> void save(T entity) {
-        DatabaseTable databaseTable = getDatabaseTable(entity.getClass().getSimpleName());
+        DatabaseTable databaseTable = getDatabaseTable(entity.getClass());
 
         if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
             throw new PersistenceException("Table name, columns, values names can't match SQL commands");
@@ -132,7 +132,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
     @Override
     public void delete(Object entity) {
-        DatabaseTable databaseTable = getDatabaseTable(entity.getClass().getSimpleName());
+        DatabaseTable databaseTable = getDatabaseTable(entity.getClass());
 
         if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
             throw new PersistenceException("Table name, columns, values names can't match SQL commands");
@@ -159,15 +159,16 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         }
     }
 
-    private DatabaseTable getDatabaseTable(String tableName) {
-        StringBuilder tables = new StringBuilder();
+    private DatabaseTable getDatabaseTable(Class<?> objectClass) {
+        return tableReflection.createDatabaseTables(objectClass).getFirst();
+        /*StringBuilder tables = new StringBuilder();
         for(DatabaseTable databaseTable : databaseTableList){
             tables.append("name").append(databaseTable.getName()).append(" databaseColumnList").append(databaseTable.getDatabaseColumnList()).append(" foreignKeyList").append(databaseTable.getForeignKeyList()).append("\n");
         }
         return databaseTableList.stream()
                 .filter(table -> table.getName().equalsIgnoreCase(tableName))
                 .findFirst()
-                .orElseThrow(() -> new PersistenceException("No such database table: " + tableName + " in databaseTableList\n" + tables));
+                .orElseThrow(() -> new PersistenceException("No such database table: " + tableName + " in databaseTableList\n" + tables));*/
     }
 
     private boolean idExist(DatabaseTable databaseTable, long id) {
