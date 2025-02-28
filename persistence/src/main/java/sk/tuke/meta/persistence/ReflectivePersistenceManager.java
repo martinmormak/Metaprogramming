@@ -160,13 +160,14 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     }
 
     private DatabaseTable getDatabaseTable(String tableName) {
+        StringBuilder tables = new StringBuilder();
         for(DatabaseTable databaseTable : databaseTableList){
-            System.out.println("name" + databaseTable.getName() + "databaseColumnList" + databaseTable.getDatabaseColumnList() + "foreignKeyList" + databaseTable.getForeignKeyList());
+            tables.append("name").append(databaseTable.getName()).append(" databaseColumnList").append(databaseTable.getDatabaseColumnList()).append(" foreignKeyList").append(databaseTable.getForeignKeyList()).append("\n");
         }
         return databaseTableList.stream()
                 .filter(table -> table.getName().equalsIgnoreCase(tableName))
                 .findFirst()
-                .orElseThrow(() -> new PersistenceException("No such database table: " + tableName));
+                .orElseThrow(() -> new PersistenceException("No such database table: " + tableName + " in databaseTableList\n" + tables));
     }
 
     private boolean idExist(DatabaseTable databaseTable, long id) {

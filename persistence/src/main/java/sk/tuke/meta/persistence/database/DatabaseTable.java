@@ -73,11 +73,11 @@ public class DatabaseTable {
 
     public boolean checkIfContainsSQLCommands() {
         for (DatabaseColumn column : databaseColumnList) {
-            if(SQL_KEYWORDS.contains(column.name())) {
-                return false;
+            if(SQL_KEYWORDS.contains(column.name().toUpperCase())) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     public boolean checkIfContainsSQLCommands(Object entity) {
@@ -87,12 +87,12 @@ public class DatabaseTable {
                 field = entity.getClass().getDeclaredField(column.name());
                 field.setAccessible(true);
                 if(SQL_KEYWORDS.contains(field.get(entity).toString().toUpperCase())) {
-                    return false;
+                    return true;
                 }
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 throw new PersistenceException("No such field: " + column.name());
             }
         }
-        return true;
+        return false;
     }
 }
