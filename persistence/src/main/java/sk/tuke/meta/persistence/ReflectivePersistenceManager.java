@@ -50,6 +50,9 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     @Override
     public <T> Optional<T> get(Class<T> type, long id) {
         DatabaseTable databaseTable = getDatabaseTable(type);
+        if(databaseTable == null) {
+            return Optional.empty();
+        }
 
         try {
             if (databaseTable.checkIfContainsSQLCommands()) {
@@ -81,6 +84,9 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     @Override
     public <T> List<T> getAll(Class<T> type) {
         DatabaseTable databaseTable = getDatabaseTable(type);
+        if(databaseTable == null) {
+            return List.of();
+        }
 
         try {
             if (databaseTable.checkIfContainsSQLCommands()) {
@@ -112,6 +118,9 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     @Override
     public <T> void save(T entity) {
         DatabaseTable databaseTable = getDatabaseTable(entity.getClass());
+        if(databaseTable == null) {
+            return;
+        }
 
         try {
             if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
@@ -165,6 +174,9 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     @Override
     public void delete(Object entity) {
         DatabaseTable databaseTable = getDatabaseTable(entity.getClass());
+        if(databaseTable == null) {
+            return;
+        }
 
         long id = (long) tableReflection.getFieldValue(entity, databaseTable, "id");
 
@@ -201,7 +213,11 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     }
 
     private DatabaseTable getDatabaseTable(Class<?> objectClass) {
-        return tableReflection.createDatabaseTable(objectClass);
+        try {
+            return tableReflection.createDatabaseTable(objectClass);
+        } catch (PersistenceException e) {
+            return null;
+        }
         /*StringBuilder tables = new StringBuilder();
         for(DatabaseTable databaseTable : databaseTableList){
             tables.append("name").append(databaseTable.getName()).append(" databaseColumnList").append(databaseTable.getDatabaseColumnList()).append(" foreignKeyList").append(databaseTable.getForeignKeyList()).append("\n");
@@ -219,7 +235,12 @@ public class ReflectivePersistenceManager implements PersistenceManager {
                 field.setAccessible(true);
                 Object value = field.get(entity);
 
-                long id = (long) tableReflection.getFieldValue(value, getDatabaseTable(value.getClass()), "id");
+                DatabaseTable foreignDatabaseTable = getDatabaseTable(value.getClass());
+                if (foreignDatabaseTable == null) {
+                    return false;
+                }
+
+                long id = (long) tableReflection.getFieldValue(value, foreignDatabaseTable, "id");
                 if (id != 0) {
                     if (!idExist(getDatabaseTable(value.getClass()), id)) {
                         return false;

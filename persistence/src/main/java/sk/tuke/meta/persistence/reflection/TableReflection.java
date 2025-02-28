@@ -39,7 +39,11 @@ public class TableReflection {
     }
 
     public DatabaseTable createDatabaseTable(Class<?> type) {
-        return new DatabaseTable(type.getSimpleName(), createDatabaseColumns(type), false);
+        DatabaseTable databaseTable = new DatabaseTable(type.getSimpleName(), createDatabaseColumns(type), false);
+        if (databaseTable.checkIfContainsSQLCommands()) {
+            throw new PersistenceException("Table or columns names can't match SQL commands");
+        }
+        return databaseTable;
     }
 
     public <T> int prepareStatementWithExceptionList(T entity, PreparedStatement preparedStatement, DatabaseTable databaseTable, List<String> exceptionList) {
