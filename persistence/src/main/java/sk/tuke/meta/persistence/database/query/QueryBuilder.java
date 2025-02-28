@@ -1,5 +1,6 @@
 package sk.tuke.meta.persistence.database.query;
 
+import sk.tuke.meta.persistence.PersistenceException;
 import sk.tuke.meta.persistence.database.DatabaseColumn;
 import sk.tuke.meta.persistence.database.DatabaseTable;
 
@@ -8,6 +9,10 @@ import java.util.List;
 
 public class QueryBuilder {
     public String getCreateTableQuery(DatabaseTable databaseTable) {
+        if (databaseTable.checkIfContainsSQLCommands()) {
+            throw new PersistenceException("Table name, columns names can't match SQL commands");
+        }
+
         StringBuilder query = new StringBuilder("CREATE TABLE IF NOT EXISTS " + databaseTable.getName() + " (\n");
         List<String> foreignKeys = new ArrayList<>();
         boolean hasPrimaryKey = false;
@@ -52,14 +57,23 @@ public class QueryBuilder {
     }
 
     public String getSelectOneQuery (DatabaseTable databaseTable) {
+        if (databaseTable.checkIfContainsSQLCommands()) {
+            throw new PersistenceException("Table name, columns, values names can't match SQL commands");
+        }
         return "SELECT * FROM " + databaseTable.getName() +" WHERE id = ?";
     }
 
     public String getSelectAllQuery (DatabaseTable databaseTable) {
+        if (databaseTable.checkIfContainsSQLCommands()) {
+            throw new PersistenceException("Table name, columns, values names can't match SQL commands");
+        }
         return "SELECT * FROM " + databaseTable.getName();
     }
 
     public String getInsertQuery (DatabaseTable databaseTable) {
+        if (databaseTable.checkIfContainsSQLCommands()) {
+            throw new PersistenceException("Table name, columns, values names can't match SQL commands");
+        }
         StringBuilder query = new StringBuilder("INSERT INTO " + databaseTable.getName() + " (");
         for (DatabaseColumn databaseColumn : databaseTable.getDatabaseColumnList()) {
             if(!databaseColumn.name().equals("id")) {
@@ -77,6 +91,9 @@ public class QueryBuilder {
     }
 
     public String getUpdateQuery (DatabaseTable databaseTable) {
+        if (databaseTable.checkIfContainsSQLCommands()) {
+            throw new PersistenceException("Table name, columns, values names can't match SQL commands");
+        }
         StringBuilder query = new StringBuilder("UPDATE " + databaseTable.getName() + " SET ");
         for (DatabaseColumn databaseColumn : databaseTable.getDatabaseColumnList()) {
             if(!databaseColumn.name().equals("id")) {
@@ -90,10 +107,16 @@ public class QueryBuilder {
     }
 
     public String getOneItemById(DatabaseTable databaseTable) {
+        if (databaseTable.checkIfContainsSQLCommands()) {
+            throw new PersistenceException("Table name, columns, values names can't match SQL commands");
+        }
         return "SELECT 1 FROM " + databaseTable.getName() + " WHERE id = ?";
     }
 
     public String getDeleteQuery (DatabaseTable databaseTable) {
+        if (databaseTable.checkIfContainsSQLCommands()) {
+            throw new PersistenceException("Table name, columns, values names can't match SQL commands");
+        }
         return  "DELETE FROM " + databaseTable.getName() + " WHERE id = ?";
     }
 }
