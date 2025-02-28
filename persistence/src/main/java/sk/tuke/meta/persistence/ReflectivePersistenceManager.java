@@ -21,6 +21,13 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     public void createTables(Class<?>... types) {
         databaseTableList = tableReflection.createDatabaseTables(types);
 
+        for (DatabaseTable databaseTable : databaseTableList) {
+            if (databaseTable.checkIfContainsSQLCommands()) {
+                databaseTableList.remove(databaseTable);
+                throw new PersistenceException("Table name, columns  names can't match SQL commands");
+            }
+        }
+
         boolean allTablesCreated;
         int loop = 0;
         do {
@@ -40,6 +47,11 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     @Override
     public <T> Optional<T> get(Class<T> type, long id) {
         DatabaseTable databaseTable = getDatabaseTable(type.getSimpleName());
+
+        if (databaseTable.checkIfContainsSQLCommands()) {
+            throw new PersistenceException("Table name, columns names can't match SQL commands");
+        }
+
         String query = queryBuilder.getSelectOneQuery(databaseTable);
 
         if (query == null) {
@@ -62,6 +74,11 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     @Override
     public <T> List<T> getAll(Class<T> type) {
         DatabaseTable databaseTable = getDatabaseTable(type.getSimpleName());
+
+        if (databaseTable.checkIfContainsSQLCommands()) {
+            throw new PersistenceException("Table name, columns names can't match SQL commands");
+        }
+
         String query = queryBuilder.getSelectAllQuery(databaseTable);
 
         if (query == null) {
@@ -84,6 +101,10 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     @Override
     public <T> void save(T entity) {
         DatabaseTable databaseTable = getDatabaseTable(entity.getClass().getSimpleName());
+
+        if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
+            throw new PersistenceException("Table name, columns, values names can't match SQL commands");
+        }
 
         long id = (long) tableReflection.getFieldValue(entity,databaseTable,"id");
 
@@ -112,6 +133,11 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     @Override
     public void delete(Object entity) {
         DatabaseTable databaseTable = getDatabaseTable(entity.getClass().getSimpleName());
+
+        if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
+            throw new PersistenceException("Table name, columns, values names can't match SQL commands");
+        }
+
         String deleteQuery = queryBuilder.getDeleteQuery(databaseTable);
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery)) {

@@ -8,6 +8,7 @@ import sk.tuke.meta.persistence.entity.Entity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,7 +33,11 @@ public class TableReflection {
         List<DatabaseTable> databaseTableList = new ArrayList<>();
         for (Class<?> type : types) {
             System.out.println("Creating database tables for type " + type.getName());
-            databaseTableList.add(new DatabaseTable(type.getSimpleName(), createDatabaseColumns(type), false));
+            DatabaseTable databaseTable = new DatabaseTable(type.getSimpleName(), createDatabaseColumns(type), false);
+            if (databaseTable.checkIfContainsSQLCommands()) {
+                throw new PersistenceException("Table or columns names can't match SQL commands");
+            }
+            databaseTableList.add(databaseTable);
         }
         databaseTableList.sort(Comparator.comparing(DatabaseTable::getForeignKeyListSize));
         return databaseTableList;
