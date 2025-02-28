@@ -43,7 +43,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         String query = queryBuilder.getSelectOneQuery(databaseTable);
 
         if (query == null) {
-            throw new PersistenceException("No such database table");
+            throw new PersistenceException("No such database table, query is null in get");
         }
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -65,7 +65,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         String query = queryBuilder.getSelectAllQuery(databaseTable);
 
         if (query == null) {
-            throw new PersistenceException("No such database table");
+            throw new PersistenceException("No such database table, query is null in get");
         }
 
         List<T> instances = new ArrayList<>();
@@ -134,6 +134,9 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     }
 
     private DatabaseTable getDatabaseTable(String tableName) {
+        for(DatabaseTable databaseTable : databaseTableList){
+            System.out.println("name" + databaseTable.getName() + "databaseColumnList" + databaseTable.getDatabaseColumnList() + "foreignKeyList" + databaseTable.getForeignKeyList());
+        }
         return databaseTableList.stream()
                 .filter(table -> table.getName().equalsIgnoreCase(tableName))
                 .findFirst()
