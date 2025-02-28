@@ -32,15 +32,18 @@ public class TableReflection {
     public List<DatabaseTable> createDatabaseTables(Class<?>... types) {
         List<DatabaseTable> databaseTableList = new ArrayList<>();
         for (Class<?> type : types) {
-            System.out.println("Creating database tables for type " + type.getName());
+            databaseTableList.add(createDatabaseTable(type));
+        }
+        databaseTableList.sort(Comparator.comparing(DatabaseTable::getForeignKeyListSize));
+        return databaseTableList;
+    }
+
+    public DatabaseTable createDatabaseTable(Class<?> type) {
             DatabaseTable databaseTable = new DatabaseTable(type.getSimpleName(), createDatabaseColumns(type), false);
             if (databaseTable.checkIfContainsSQLCommands()) {
                 throw new PersistenceException("Table or columns names can't match SQL commands");
             }
-            databaseTableList.add(databaseTable);
-        }
-        databaseTableList.sort(Comparator.comparing(DatabaseTable::getForeignKeyListSize));
-        return databaseTableList;
+        return databaseTable;
     }
 
     public <T> int prepareStatementWithExceptionList(T entity, PreparedStatement preparedStatement, DatabaseTable databaseTable, List<String> exceptionList) {

@@ -160,7 +160,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     }
 
     private DatabaseTable getDatabaseTable(Class<?> objectClass) {
-        return tableReflection.createDatabaseTables(objectClass).getFirst();
+        return tableReflection.createDatabaseTable(objectClass);
         /*StringBuilder tables = new StringBuilder();
         for(DatabaseTable databaseTable : databaseTableList){
             tables.append("name").append(databaseTable.getName()).append(" databaseColumnList").append(databaseTable.getDatabaseColumnList()).append(" foreignKeyList").append(databaseTable.getForeignKeyList()).append("\n");
