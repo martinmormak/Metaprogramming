@@ -31,6 +31,7 @@ public class TableReflection {
     public List<DatabaseTable> createDatabaseTables(Class<?>... types) {
         List<DatabaseTable> databaseTableList = new ArrayList<>();
         for (Class<?> type : types) {
+            System.out.println("Creating database tables for type " + type.getName());
             databaseTableList.add(new DatabaseTable(type.getSimpleName(), createDatabaseColumns(type), false));
         }
         databaseTableList.sort(Comparator.comparing(DatabaseTable::getForeignKeyListSize));
