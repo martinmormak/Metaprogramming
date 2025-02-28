@@ -42,10 +42,6 @@ public class QueryBuilder {
             query.append("ID INTEGER PRIMARY KEY AUTOINCREMENT,\n");
         }
 
-        if (foreignKeys.size() == databaseTable.getDatabaseColumnList().size()) {
-            System.out.println("FOREIGN KEY FOREIGN KEY SAME");
-        }
-
         for (String foreignKey : foreignKeys) {
             query.append("FOREIGN KEY (").append(foreignKey).append(") REFERENCES ").append(foreignKey).append(" ( ID ) ON DELETE SET NULL");
             query.append(",\n");

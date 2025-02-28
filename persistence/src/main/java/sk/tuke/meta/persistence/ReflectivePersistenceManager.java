@@ -4,6 +4,7 @@ import sk.tuke.meta.persistence.database.DatabaseTable;
 import sk.tuke.meta.persistence.database.query.QueryBuilder;
 import sk.tuke.meta.persistence.reflection.TableReflection;
 
+import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.*;
 
@@ -11,7 +12,6 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     private final QueryBuilder queryBuilder = new QueryBuilder();
     private final TableReflection tableReflection = new TableReflection(this);
     private final Connection connection;
-    private List<DatabaseTable> databaseTableList = new ArrayList<>();
 
     public ReflectivePersistenceManager(Connection connection) {
         this.connection = connection;
@@ -19,7 +19,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
     @Override
     public void createTables(Class<?>... types) {
-        databaseTableList = tableReflection.createDatabaseTables(types);
+        List<DatabaseTable> databaseTableList = tableReflection.createDatabaseTables(types);
 
         for (DatabaseTable databaseTable : databaseTableList) {
             if (databaseTable.checkIfContainsSQLCommands()) {
@@ -109,8 +109,11 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         long id = (long) tableReflection.getFieldValue(entity,databaseTable,"id");
 
         try {
-            String updateQuery = queryBuilder.getUpdateQuery(databaseTable);
+            if(!checkForeignKeysExists(entity,databaseTable)){
+                throw new PersistenceException("Foreign keys doesn't exists");
+            }
             if (idExist(databaseTable, id)) {
+                String updateQuery = queryBuilder.getUpdateQuery(databaseTable);
                 PreparedStatement preparedStatement = connection.prepareStatement(updateQuery);
                 tableReflection.prepareStatementWithExcludedList(tableReflection.prepareStatementWithExceptionList(entity,preparedStatement,databaseTable,List.of("id")),entity,preparedStatement,databaseTable,List.of("id"));
                 preparedStatement.execute();
@@ -133,6 +136,12 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     @Override
     public void delete(Object entity) {
         DatabaseTable databaseTable = getDatabaseTable(entity.getClass());
+
+        long id = (long) tableReflection.getFieldValue(entity,databaseTable,"id");
+
+        if(!idExist(databaseTable, id)){
+            throw new PersistenceException("Object not found in database");
+        }
 
         if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
             return;
@@ -169,6 +178,29 @@ public class ReflectivePersistenceManager implements PersistenceManager {
                 .filter(table -> table.getName().equalsIgnoreCase(tableName))
                 .findFirst()
                 .orElseThrow(() -> new PersistenceException("No such database table: " + tableName + " in databaseTableList\n" + tables));*/
+    }
+
+    private <T> boolean checkForeignKeysExists(T entity, DatabaseTable databaseTable) {
+        for (String fieldName : databaseTable.getForeignKeyList()) {
+            try {
+                Field field = entity.getClass().getDeclaredField(fieldName);
+                field.setAccessible(true);
+                Object value = field.get(entity);
+
+                long id = (long) tableReflection.getFieldValue(value, getDatabaseTable(value.getClass()),"id");
+                if (id!=0) {
+                    if (!idExist(getDatabaseTable(value.getClass()), id)) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new PersistenceException("Error checking foreign keys", e);
+            }
+        }
+        return true;
     }
 
     private boolean idExist(DatabaseTable databaseTable, long id) {
