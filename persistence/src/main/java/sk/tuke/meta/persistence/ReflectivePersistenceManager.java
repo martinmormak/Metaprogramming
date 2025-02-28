@@ -23,8 +23,11 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
         for (DatabaseTable databaseTable : databaseTableList) {
             if (databaseTable.checkIfContainsSQLCommands()) {
-                databaseTableList.remove(databaseTable);
-                return;
+                try {
+                    return;
+                }catch (PersistenceException e) {
+                    return;
+                }
             }
         }
 
@@ -49,7 +52,11 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         DatabaseTable databaseTable = getDatabaseTable(type);
 
         if (databaseTable.checkIfContainsSQLCommands()) {
-            return Optional.empty();
+            try {
+                return Optional.empty();
+            }catch (PersistenceException e) {
+                return Optional.empty();
+            }
         }
 
         String query = queryBuilder.getSelectOneQuery(databaseTable);
@@ -76,7 +83,11 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         DatabaseTable databaseTable = getDatabaseTable(type);
 
         if (databaseTable.checkIfContainsSQLCommands()) {
-            return List.of();
+            try {
+                return List.of();
+            }catch (PersistenceException e) {
+                return List.of();
+            }
         }
 
         String query = queryBuilder.getSelectAllQuery(databaseTable);
@@ -103,7 +114,11 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         DatabaseTable databaseTable = getDatabaseTable(entity.getClass());
 
         if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
-            return;
+            try {
+                return;
+            }catch (PersistenceException e) {
+                return;
+            }
         }
 
         long id = (long) tableReflection.getFieldValue(entity,databaseTable,"id");
@@ -144,7 +159,11 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         }
 
         if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
-            return;
+            try {
+                return;
+            }catch (PersistenceException e) {
+                return;
+            }
         }
 
         String deleteQuery = queryBuilder.getDeleteQuery(databaseTable);
