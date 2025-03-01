@@ -70,41 +70,4 @@ public class DatabaseTable {
         }
         return values;
     }
-
-    public boolean checkIfContainsSQLCommands() {
-        if(SQL_KEYWORDS.stream().anyMatch(keyword -> keyword.equalsIgnoreCase(this.name))){
-            return true;
-        }
-        for (DatabaseColumn column : databaseColumnList) {
-            if(SQL_KEYWORDS.stream().anyMatch(keyword -> keyword.equalsIgnoreCase(column.name()))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean checkIfContainsSQLCommands(Object entity) {
-        if(SQL_KEYWORDS.stream().anyMatch(keyword -> keyword.equalsIgnoreCase(this.name))){
-            return true;
-        }
-        for (DatabaseColumn column : databaseColumnList) {
-            Field field;
-            try {
-                field = entity.getClass().getDeclaredField(column.name());
-                field.setAccessible(true);
-                if(SQL_KEYWORDS.stream().anyMatch(keyword -> {
-                    try {
-                        return keyword.equalsIgnoreCase(field.get(entity).toString());
-                    } catch (IllegalAccessException e) {
-                        throw new PersistenceException("No such field:",e);
-                    }
-                })) {
-                    return true;
-                }
-            } catch (NoSuchFieldException e) {
-                throw new PersistenceException("No such field: " + column.name());
-            }
-        }
-        return false;
-    }
 }

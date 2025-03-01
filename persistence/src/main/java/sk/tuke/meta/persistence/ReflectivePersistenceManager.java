@@ -21,17 +21,6 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     public void createTables(Class<?>... types) {
         List<DatabaseTable> databaseTableList = tableReflection.createDatabaseTables(types);
 
-        for (DatabaseTable databaseTable : databaseTableList) {
-            try {
-                if (databaseTable.checkIfContainsSQLCommands()) {
-                    return;
-
-                }
-            } catch (PersistenceException e) {
-                return;
-            }
-        }
-
         boolean allTablesCreated;
         int loop = 0;
         do {
@@ -51,14 +40,6 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     public <T> Optional<T> get(Class<T> type, long id) {
         DatabaseTable databaseTable = getDatabaseTable(type);
         if(databaseTable == null) {
-            return Optional.empty();
-        }
-
-        try {
-            if (databaseTable.checkIfContainsSQLCommands()) {
-                return Optional.empty();
-            }
-        } catch (PersistenceException e) {
             return Optional.empty();
         }
 
@@ -88,14 +69,6 @@ public class ReflectivePersistenceManager implements PersistenceManager {
             return List.of();
         }
 
-        try {
-            if (databaseTable.checkIfContainsSQLCommands()) {
-                return List.of();
-            }
-        } catch (PersistenceException e) {
-            return List.of();
-        }
-
         String query = queryBuilder.getSelectAllQuery(databaseTable);
 
         if (query == null) {
@@ -119,15 +92,6 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     public <T> void save(T entity) {
         DatabaseTable databaseTable = getDatabaseTable(entity.getClass());
         if(databaseTable == null) {
-            return;
-        }
-
-        try {
-            if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
-                return;
-
-            }
-        } catch (PersistenceException e) {
             return;
         }
 
@@ -184,13 +148,6 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
         if (!idExist(databaseTable, id)) {
             throw new PersistenceException("Object not found in database");
-        }
-        try {
-            if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
-                return;
-            }
-        } catch (PersistenceException e) {
-            return;
         }
 
         String deleteQuery = queryBuilder.getDeleteQuery(databaseTable);
