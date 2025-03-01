@@ -22,14 +22,9 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         List<DatabaseTable> databaseTableList = tableReflection.createDatabaseTables(types);
 
         for (DatabaseTable databaseTable : databaseTableList) {
-            try {
                 if (databaseTable.checkIfContainsSQLCommands()) {
                     return;
-
                 }
-            } catch (PersistenceException e) {
-                return;
-            }
         }
 
         boolean allTablesCreated;
@@ -54,11 +49,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
             return Optional.empty();
         }
 
-        try {
-            if (databaseTable.checkIfContainsSQLCommands()) {
-                return Optional.empty();
-            }
-        } catch (PersistenceException e) {
+        if (databaseTable.checkIfContainsSQLCommands()) {
             return Optional.empty();
         }
 
@@ -88,11 +79,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
             return List.of();
         }
 
-        try {
-            if (databaseTable.checkIfContainsSQLCommands()) {
-                return List.of();
-            }
-        } catch (PersistenceException e) {
+        if (databaseTable.checkIfContainsSQLCommands()) {
             return List.of();
         }
 
@@ -122,12 +109,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
             return;
         }
 
-        try {
-            if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
-                return;
-
-            }
-        } catch (PersistenceException e) {
+        if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
             return;
         }
 
@@ -185,11 +167,8 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         if (!idExist(databaseTable, id)) {
             throw new PersistenceException("Object not found in database");
         }
-        try {
-            if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
-                return;
-            }
-        } catch (PersistenceException e) {
+
+        if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
             return;
         }
 
@@ -215,19 +194,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     }
 
     private DatabaseTable getDatabaseTable(Class<?> objectClass) {
-        try {
-            return tableReflection.createDatabaseTable(objectClass);
-        } catch (PersistenceException e) {
-            return null;
-        }
-        /*StringBuilder tables = new StringBuilder();
-        for(DatabaseTable databaseTable : databaseTableList){
-            tables.append("name").append(databaseTable.getName()).append(" databaseColumnList").append(databaseTable.getDatabaseColumnList()).append(" foreignKeyList").append(databaseTable.getForeignKeyList()).append("\n");
-        }
-        return databaseTableList.stream()
-                .filter(table -> table.getName().equalsIgnoreCase(tableName))
-                .findFirst()
-                .orElseThrow(() -> new PersistenceException("No such database table: " + tableName + " in databaseTableList\n" + tables));*/
+        return tableReflection.createDatabaseTable(objectClass);
     }
 
     private <T> boolean checkForeignKeysExists(T entity, DatabaseTable databaseTable) {

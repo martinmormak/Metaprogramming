@@ -96,13 +96,13 @@ public class DatabaseTable {
                     try {
                         return keyword.equalsIgnoreCase(field.get(entity).toString());
                     } catch (IllegalAccessException e) {
-                        throw new PersistenceException("No such field:",e);
+                        return true;
                     }
                 })) {
                     return true;
                 }
             } catch (NoSuchFieldException e) {
-                throw new PersistenceException("No such field: " + column.name());
+                return true;
             }
         }
         return false;

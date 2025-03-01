@@ -8,7 +8,6 @@ import sk.tuke.meta.persistence.entity.Entity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -39,11 +38,7 @@ public class TableReflection {
     }
 
     public DatabaseTable createDatabaseTable(Class<?> type) {
-        DatabaseTable databaseTable = new DatabaseTable(type.getSimpleName(), createDatabaseColumns(type), false);
-        if (databaseTable.checkIfContainsSQLCommands()) {
-            throw new PersistenceException("Table or columns names can't match SQL commands");
-        }
-        return databaseTable;
+        return new DatabaseTable(type.getSimpleName(), createDatabaseColumns(type), false);
     }
 
     public <T> int prepareStatementWithExceptionList(T entity, PreparedStatement preparedStatement, DatabaseTable databaseTable, List<String> exceptionList) {
