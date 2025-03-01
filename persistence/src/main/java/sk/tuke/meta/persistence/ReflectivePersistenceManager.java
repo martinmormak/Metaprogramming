@@ -21,7 +21,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     public void createTables(Class<?>... types) {
         List<DatabaseTable> databaseTableList = tableReflection.createDatabaseTables(types);
 
-        for (DatabaseTable databaseTable : databaseTableList) {
+        /*for (DatabaseTable databaseTable : databaseTableList) {
             try {
                 if (databaseTable.checkIfContainsSQLCommands()) {
                     return;
@@ -30,7 +30,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
             } catch (PersistenceException e) {
                 return;
             }
-        }
+        }*/
 
         boolean allTablesCreated;
         int loop = 0;
@@ -51,15 +51,16 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     public <T> Optional<T> get(Class<T> type, long id) {
         DatabaseTable databaseTable = getDatabaseTable(type);
 
-        try {
+        /*try {
             if (databaseTable.checkIfContainsSQLCommands()) {
                 return Optional.empty();
             }
         } catch (PersistenceException e) {
             return Optional.empty();
-        }
+        }*/
 
         String query = queryBuilder.getSelectOneQuery(databaseTable);
+        System.out.println(query);
 
         if (query == null) {
             throw new PersistenceException("No such database table, query is null in get");
@@ -82,15 +83,16 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     public <T> List<T> getAll(Class<T> type) {
         DatabaseTable databaseTable = getDatabaseTable(type);
 
-        try {
+        /*try {
             if (databaseTable.checkIfContainsSQLCommands()) {
                 return List.of();
             }
         } catch (PersistenceException e) {
             return List.of();
-        }
+        }*/
 
         String query = queryBuilder.getSelectAllQuery(databaseTable);
+        System.out.println(query);
 
         if (query == null) {
             throw new PersistenceException("No such database table, query is null in get");
@@ -113,14 +115,13 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     public <T> void save(T entity) {
         DatabaseTable databaseTable = getDatabaseTable(entity.getClass());
 
-        try {
+        /*try {
             if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
                 return;
-
             }
         } catch (PersistenceException e) {
             return;
-        }
+        }*/
 
         long id = (long) tableReflection.getFieldValue(entity, databaseTable, "id");
 
@@ -171,15 +172,16 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         if (!idExist(databaseTable, id)) {
             throw new PersistenceException("Object not found in database");
         }
-        try {
+        /*try {
             if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
                 return;
             }
         } catch (PersistenceException e) {
             return;
-        }
+        }*/
 
         String deleteQuery = queryBuilder.getDeleteQuery(databaseTable);
+        System.out.println(deleteQuery);
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery)) {
             tableReflection.prepareStatementWithExcludedList(entity, preparedStatement, databaseTable, List.of("id"));
@@ -237,6 +239,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
     private boolean idExist(DatabaseTable databaseTable, long id) {
         String query = queryBuilder.getOneItemById(databaseTable);
+        System.out.println(query);
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

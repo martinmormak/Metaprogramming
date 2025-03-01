@@ -95,10 +95,10 @@ public class Main {
             System.out.println("getAll " + e.getMessage());
         }
 
-        try {
+        /*try {
             manager.delete(select);
         } catch (PersistenceException e){
             System.out.println("delete " + e.getMessage());
-        }
+        }*/
     }
 }

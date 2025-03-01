@@ -4,6 +4,9 @@ public class Select {
     private long id;
     private String surname;
 
+    public Select(){
+    }
+
     public Select(long id, String surname) {
         this.id = id;
         this.surname = surname;

@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 public class DatabaseTable {
-    private static final List<String> SQL_KEYWORDS = Arrays.asList("SELECT", "INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "CREATE", "TRUNCATE", "EXEC", "UNION", "--", ";");
+    //private static final List<String> SQL_KEYWORDS = Arrays.asList("SELECT", "INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "CREATE", "TRUNCATE", "EXEC", "UNION", "--", ";");
 
     private final String name;
     private final List<DatabaseColumn> databaseColumnList;
@@ -71,7 +71,7 @@ public class DatabaseTable {
         return values;
     }
 
-    public boolean checkIfContainsSQLCommands() {
+    /*public boolean checkIfContainsSQLCommands() {
         if(SQL_KEYWORDS.stream().anyMatch(keyword -> keyword.equalsIgnoreCase(this.name))){
             return true;
         }
@@ -106,5 +106,5 @@ public class DatabaseTable {
             }
         }
         return false;
-    }
+    }*/
 }

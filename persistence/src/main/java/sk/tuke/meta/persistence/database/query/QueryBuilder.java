@@ -1,6 +1,5 @@
 package sk.tuke.meta.persistence.database.query;
 
-import sk.tuke.meta.persistence.PersistenceException;
 import sk.tuke.meta.persistence.database.DatabaseColumn;
 import sk.tuke.meta.persistence.database.DatabaseTable;
 
@@ -9,17 +8,14 @@ import java.util.List;
 
 public class QueryBuilder {
     public String getCreateTableQuery(DatabaseTable databaseTable) {
-        if (databaseTable.checkIfContainsSQLCommands()) {
-            throw new PersistenceException("Table name, columns names can't match SQL commands");
-        }
 
-        StringBuilder query = new StringBuilder("CREATE TABLE IF NOT EXISTS " + databaseTable.getName() + " (\n");
+        StringBuilder query = new StringBuilder("CREATE TABLE IF NOT EXISTS \"" + databaseTable.getName() + "\" (\n\"");
         List<String> foreignKeys = new ArrayList<>();
         boolean hasPrimaryKey = false;
 
         for (DatabaseColumn databaseColumn : databaseTable.getDatabaseColumnList()) {
 
-            query.append(databaseColumn.name()).append(" ");
+            query.append(databaseColumn.name()).append("\" ");
 
             if (databaseColumn.type().equals(long.class)) {
                 hasPrimaryKey = true;
@@ -35,50 +31,46 @@ public class QueryBuilder {
                 query.append("INTEGER");
                 foreignKeys.add(databaseColumn.name());
             }
-            query.append(",\n");
+            query.append(",\n\"");
         }
 
+        query.deleteCharAt(query.length() - 1);
         if (!hasPrimaryKey) {
             query.append("ID INTEGER PRIMARY KEY AUTOINCREMENT,\n");
         }
 
         for (String foreignKey : foreignKeys) {
-            query.append("FOREIGN KEY (").append(foreignKey).append(") REFERENCES ").append(foreignKey).append(" ( ID ) ON DELETE SET NULL");
+            query.append("FOREIGN KEY (\"").append(foreignKey).append("\") REFERENCES \"").append(foreignKey).append("\" ( ID ) ON DELETE SET NULL");
             query.append(",\n");
         }
         query.deleteCharAt(query.length() - 1);
         query.deleteCharAt(query.length() - 1);
         query.append("\n);");
+        
+        System.out.println(query);
         return query.toString();
     }
 
     public String getSelectOneQuery (DatabaseTable databaseTable) {
-        if (databaseTable.checkIfContainsSQLCommands()) {
-            throw new PersistenceException("Table name, columns, values names can't match SQL commands");
-        }
-        return "SELECT * FROM " + databaseTable.getName() +" WHERE id = ?";
+        return "SELECT * FROM \"" + databaseTable.getName() +"\" WHERE id = ?;";
     }
 
     public String getSelectAllQuery (DatabaseTable databaseTable) {
-        if (databaseTable.checkIfContainsSQLCommands()) {
-            throw new PersistenceException("Table name, columns, values names can't match SQL commands");
-        }
-        return "SELECT * FROM " + databaseTable.getName();
+        return "SELECT * FROM \"" + databaseTable.getName() +"\";";
     }
 
     public String getInsertQuery (DatabaseTable databaseTable) {
-        if (databaseTable.checkIfContainsSQLCommands()) {
-            throw new PersistenceException("Table name, columns, values names can't match SQL commands");
-        }
-        StringBuilder query = new StringBuilder("INSERT INTO " + databaseTable.getName() + " (");
+        StringBuilder query = new StringBuilder("INSERT INTO \"" + databaseTable.getName() + "\" (\"");
         for (DatabaseColumn databaseColumn : databaseTable.getDatabaseColumnList()) {
             if(!databaseColumn.name().equals("id")) {
-                query.append(databaseColumn.name()).append(", ");
+                query.append(databaseColumn.name()).append("\", \"");
             }
         }
         query.deleteCharAt(query.length() - 1);
         query.deleteCharAt(query.length() - 1);
-        query.append(") VALUES (");
+        query.deleteCharAt(query.length() - 1);
+        query.deleteCharAt(query.length() - 1);
+        query.append("\") VALUES (");
         query.append("?, ".repeat(Math.max(0, databaseTable.getDatabaseColumnList().size() - 1)));
         query.deleteCharAt(query.length() - 1);
         query.deleteCharAt(query.length() - 1);
@@ -87,15 +79,13 @@ public class QueryBuilder {
     }
 
     public String getUpdateQuery (DatabaseTable databaseTable) {
-        if (databaseTable.checkIfContainsSQLCommands()) {
-            throw new PersistenceException("Table name, columns, values names can't match SQL commands");
-        }
-        StringBuilder query = new StringBuilder("UPDATE " + databaseTable.getName() + " SET ");
+        StringBuilder query = new StringBuilder("UPDATE \"" + databaseTable.getName() + "\" SET \"");
         for (DatabaseColumn databaseColumn : databaseTable.getDatabaseColumnList()) {
             if(!databaseColumn.name().equals("id")) {
-                query.append(databaseColumn.name()).append(" = ?, ");
+                query.append(databaseColumn.name()).append("\" = ?, \"");
             }
         }
+        query.deleteCharAt(query.length() - 1);
         query.deleteCharAt(query.length() - 1);
         query.deleteCharAt(query.length() - 1);
         query.append(" WHERE id = ?");
@@ -103,16 +93,10 @@ public class QueryBuilder {
     }
 
     public String getOneItemById(DatabaseTable databaseTable) {
-        if (databaseTable.checkIfContainsSQLCommands()) {
-            throw new PersistenceException("Table name, columns, values names can't match SQL commands");
-        }
-        return "SELECT 1 FROM " + databaseTable.getName() + " WHERE id = ?";
+        return "SELECT 1 FROM \"" + databaseTable.getName() + "\" WHERE id = ?";
     }
 
     public String getDeleteQuery (DatabaseTable databaseTable) {
-        if (databaseTable.checkIfContainsSQLCommands()) {
-            throw new PersistenceException("Table name, columns, values names can't match SQL commands");
-        }
-        return  "DELETE FROM " + databaseTable.getName() + " WHERE id = ?";
+        return  "DELETE FROM \"" + databaseTable.getName() + "\" WHERE id = ?";
     }
 }
