@@ -135,6 +135,10 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         }
         System.out.println("entity after save" + entity);
         System.out.println("After save");
+        List<?> entities = this.getAll(entity.getClass());
+        for (Object entiti1 : entities) {
+            System.out.println(entiti1);
+        }
     }
 
     @Override
