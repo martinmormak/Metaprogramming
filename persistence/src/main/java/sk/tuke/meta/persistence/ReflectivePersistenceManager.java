@@ -138,14 +138,14 @@ public class ReflectivePersistenceManager implements PersistenceManager {
                     System.out.println("Prepared statement" + preparedStatement);
                     tableReflection.prepareStatementWithExceptionList(entity, preparedStatement, databaseTable, List.of("id"));
                     System.out.println("Prepared statement" + preparedStatement);
-                    //preparedStatement.execute();
+                    preparedStatement.execute();
                     System.out.println("Statement executed");
-                    /*ResultSet resultSet = preparedStatement.getGeneratedKeys();
+                    ResultSet resultSet = preparedStatement.getGeneratedKeys();
                     if (resultSet.next()) {
                         System.out.println("Result set next");
                         tableReflection.setField(entity, resultSet.getLong(1), "id");
                         System.out.println("Entity updated");
-                    }*/
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -162,14 +162,14 @@ public class ReflectivePersistenceManager implements PersistenceManager {
             return;
         }
 
+        if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
+            return;
+        }
+
         long id = (long) tableReflection.getFieldValue(entity, databaseTable, "id");
 
         if (!idExist(databaseTable, id)) {
             throw new PersistenceException("Object not found in database");
-        }
-
-        if (databaseTable.checkIfContainsSQLCommands() || databaseTable.checkIfContainsSQLCommands(entity)) {
-            return;
         }
 
         String deleteQuery = queryBuilder.getDeleteQuery(databaseTable);
