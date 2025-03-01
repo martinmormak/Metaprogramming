@@ -146,7 +146,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
                 System.out.println("Prepared statement" + preparedStatement);
                 tableReflection.prepareStatementWithExcludedList(tableReflection.prepareStatementWithExceptionList(entity, preparedStatement, databaseTable, List.of("id")), entity, preparedStatement, databaseTable, List.of("id"));
                 System.out.println("Prepared statement" + preparedStatement);
-                preparedStatement.executeUpdate();
+                //preparedStatement.executeUpdate();
                 System.out.println("Statement executed");
             } else {
                 System.out.println("Insert");
@@ -156,14 +156,14 @@ public class ReflectivePersistenceManager implements PersistenceManager {
                     System.out.println("Prepared statement" + preparedStatement);
                     tableReflection.prepareStatementWithExceptionList(entity, preparedStatement, databaseTable, List.of("id"));
                     System.out.println("Prepared statement" + preparedStatement);
-                    preparedStatement.execute();
+                    //preparedStatement.execute();
                     System.out.println("Statement executed");
-                    ResultSet resultSet = preparedStatement.getGeneratedKeys();
+                    /*ResultSet resultSet = preparedStatement.getGeneratedKeys();
                     if (resultSet.next()) {
                         System.out.println("Result set next");
                         tableReflection.setField(entity, resultSet.getLong(1), "id");
                         System.out.println("Entity updated");
-                    }
+                    }*/
                 }
             }
         } catch (SQLException e) {
