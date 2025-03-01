@@ -115,7 +115,6 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
         long id = (long) tableReflection.getFieldValue(entity, databaseTable, "id");
 
-        System.out.println("entity before save" + entity);
         try {
             if (!checkForeignKeysExists(entity, databaseTable)) {
                 throw new PersistenceException("Foreign keys doesn't exists");
@@ -151,7 +150,6 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         } catch (SQLException e) {
             throw new PersistenceException("ID field not found", e);
         }
-        System.out.println("entity after save" + entity);
         System.out.println("After save");
     }
 
