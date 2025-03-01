@@ -8,7 +8,6 @@ import sk.tuke.meta.persistence.entity.Entity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -51,7 +50,16 @@ public class TableReflection {
         for (Entity columnEntity : columnEntities) {
             if (!exceptionList.contains(columnEntity.name())) {
                 try {
-                    preparedStatement.setObject(index++, columnEntity.value());
+                    if(!databaseTable.getForeignKeyList().contains(columnEntity.name())) {
+                        preparedStatement.setObject(index++, columnEntity.value());
+                    } else {
+                        DatabaseTable foreignDatabaseTable = this.createDatabaseTable(columnEntity.value().getClass());
+                        if (foreignDatabaseTable == null) {
+                            throw new PersistenceException("Cannot get id from foreign database table");
+                        }
+                        long id = (long) this.getFieldValue(columnEntity.value(), foreignDatabaseTable, "id");
+                        preparedStatement.setObject(index++, id);
+                    }
                 } catch (SQLException e) {
                     throw new PersistenceException("Cannot prepare statement", e);
                 }
@@ -90,7 +98,7 @@ public class TableReflection {
             Class<?> fieldType = field.getType();
 
             if (fieldType.isPrimitive()) {
-                field.set(entity, convertPrimitive(fieldType, fieldValue));
+                field.set(entity, fieldValue);
             } else if (fieldValue == null || fieldType.isAssignableFrom(fieldValue.getClass())) {
                 field.set(entity, fieldValue);
             } else {
