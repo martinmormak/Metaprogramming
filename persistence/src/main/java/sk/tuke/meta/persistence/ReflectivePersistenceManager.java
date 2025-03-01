@@ -129,6 +129,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
             if (!checkForeignKeysExists(entity, databaseTable)) {
                 throw new PersistenceException("Foreign keys doesn't exists");
             }
+            System.out.println("entity" + entity);
             if (idExist(databaseTable, id)) {
                 System.out.println("Update");
                 String updateQuery = queryBuilder.getUpdateQuery(databaseTable);
@@ -160,6 +161,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         } catch (SQLException e) {
             throw new PersistenceException("ID field not found", e);
         }
+        System.out.println("entity" + entity);
         System.out.println("After save");
     }
 
