@@ -1,6 +1,5 @@
 package sk.tuke.meta.example;
 
-import sk.tuke.meta.persistence.PersistenceException;
 import sk.tuke.meta.persistence.PersistenceManager;
 import sk.tuke.meta.persistence.ReflectivePersistenceManager;
 
@@ -69,36 +68,5 @@ public class Main {
             System.out.println(person);
             System.out.println("  " + person.getDepartment());
         }
-
-        Select select = new Select(0,"Insert");
-        try {
-            manager.createTables(Select.class);
-        } catch (PersistenceException e){
-            System.out.println("createTables " + e.getMessage());
-        }
-
-        try {
-            manager.save(select);
-        } catch (PersistenceException e){
-            System.out.println("save " + e.getMessage());
-        }
-
-        try {
-            manager.get(Select.class, 1);
-        } catch (PersistenceException e){
-            System.out.println("get " + e.getMessage());
-        }
-
-        try {
-            manager.getAll(Select.class);
-        } catch (PersistenceException e){
-            System.out.println("getAll " + e.getMessage());
-        }
-
-        /*try {
-            manager.delete(select);
-        } catch (PersistenceException e){
-            System.out.println("delete " + e.getMessage());
-        }*/
     }
 }
