@@ -147,7 +147,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
                     System.out.println("Prepared statement" + preparedStatement);
                     tableReflection.prepareStatementWithExceptionList(entity, preparedStatement, databaseTable, List.of("id"));
                     System.out.println("Prepared statement" + preparedStatement);
-                    preparedStatement.execute();
+                    preparedStatement.executeUpdate();
                     System.out.println("Statement executed");
                     ResultSet resultSet = preparedStatement.getGeneratedKeys();
                     if (resultSet.next()) {
