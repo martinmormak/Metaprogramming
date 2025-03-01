@@ -129,11 +129,11 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
         long id = (long) tableReflection.getFieldValue(entity, databaseTable, "id");
 
-        try {
+        //try {
             if (!checkForeignKeysExists(entity, databaseTable)) {
                 throw new PersistenceException("Foreign keys doesn't exists");
             }
-            if (idExist(databaseTable, id)) {
+            /*if (idExist(databaseTable, id)) {
                 System.out.println("Update");
                 String updateQuery = queryBuilder.getUpdateQuery(databaseTable);
                 System.out.println("Update query: " + updateQuery);
@@ -163,7 +163,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
             }
         } catch (SQLException e) {
             throw new PersistenceException("ID field not found", e);
-        }
+        }*/
         System.out.println("After save");
     }
 
@@ -212,14 +212,6 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         } catch (PersistenceException e) {
             return null;
         }
-        /*StringBuilder tables = new StringBuilder();
-        for(DatabaseTable databaseTable : databaseTableList){
-            tables.append("name").append(databaseTable.getName()).append(" databaseColumnList").append(databaseTable.getDatabaseColumnList()).append(" foreignKeyList").append(databaseTable.getForeignKeyList()).append("\n");
-        }
-        return databaseTableList.stream()
-                .filter(table -> table.getName().equalsIgnoreCase(tableName))
-                .findFirst()
-                .orElseThrow(() -> new PersistenceException("No such database table: " + tableName + " in databaseTableList\n" + tables));*/
     }
 
     private <T> boolean checkForeignKeysExists(T entity, DatabaseTable databaseTable) {
