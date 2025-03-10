@@ -97,47 +97,28 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
         long id = (long) tableReflection.getFieldValue(entity, databaseTable, "id");
 
-        System.out.println("entity before save" + entity);
         try {
             if (!checkForeignKeysExists(entity, databaseTable)) {
                 throw new PersistenceException("Foreign keys doesn't exists");
             }
             if (idExist(databaseTable, id)) {
-                System.out.println("Update");
                 String updateQuery = queryBuilder.getUpdateQuery(databaseTable);
-                System.out.println("Update query: " + updateQuery);
                 PreparedStatement preparedStatement = connection.prepareStatement(updateQuery);
-                System.out.println("Prepared statement" + preparedStatement);
                 tableReflection.prepareStatementWithExcludedList(tableReflection.prepareStatementWithExceptionList(entity, preparedStatement, databaseTable, List.of("id")), entity, preparedStatement, databaseTable, List.of("id"));
-                System.out.println("Prepared statement" + preparedStatement);
                 preparedStatement.executeUpdate();
-                System.out.println("Statement executed");
             } else {
-                System.out.println("Insert");
                 String insertQuery = queryBuilder.getInsertQuery(databaseTable);
-                System.out.println("Insert query: " + insertQuery);
                 try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
-                    System.out.println("Prepared statement" + preparedStatement);
                     tableReflection.prepareStatementWithExceptionList(entity, preparedStatement, databaseTable, List.of("id"));
-                    System.out.println("Prepared statement" + preparedStatement);
                     preparedStatement.execute();
-                    System.out.println("Statement executed");
                     ResultSet resultSet = preparedStatement.getGeneratedKeys();
                     if (resultSet.next()) {
-                        System.out.println("Result set next");
                         tableReflection.setField(entity, resultSet.getLong(1), "id");
-                        System.out.println("Entity updated");
                     }
                 }
             }
         } catch (SQLException e) {
             throw new PersistenceException("ID field not found", e);
-        }
-        System.out.println("entity after save" + entity);
-        System.out.println("After save");
-        List<?> entities = this.getAll(entity.getClass());
-        for (Object entiti1 : entities) {
-            System.out.println(entiti1);
         }
     }
 

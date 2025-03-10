@@ -46,8 +46,7 @@ public class QueryBuilder {
         query.deleteCharAt(query.length() - 1);
         query.deleteCharAt(query.length() - 1);
         query.append("\n);");
-        
-        System.out.println(query);
+
         return query.toString();
     }
 

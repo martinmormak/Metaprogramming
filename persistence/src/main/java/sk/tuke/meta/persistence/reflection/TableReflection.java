@@ -46,7 +46,7 @@ public class TableReflection {
     }
 
     public <T> int prepareStatementWithExceptionList(int index, T entity, PreparedStatement preparedStatement, DatabaseTable databaseTable, List<String> exceptionList) {
-        LinkedList<Entity> columnEntities = databaseTable.getColumnValues(entity);
+        LinkedList<Entity> columnEntities = getColumnValues(entity,databaseTable);
         for (Entity columnEntity : columnEntities) {
             if (!exceptionList.contains(columnEntity.name())) {
                 try {
@@ -83,7 +83,7 @@ public class TableReflection {
     }
 
     public <T> Object getFieldValue(T entity, DatabaseTable databaseTable, String fieldName) {
-        return databaseTable.getColumnValues(entity).stream()
+        return getColumnValues(entity,databaseTable).stream()
                 .filter(columnEntity -> columnEntity.name().equals(fieldName))
                 .map(Entity::value)
                 .findFirst()
@@ -143,19 +143,19 @@ public class TableReflection {
         }
     }
 
-    private Object convertPrimitive(Class<?> fieldType, Object value) {
-        if (value == null) return 0;
-
-        if (fieldType == int.class) return ((Number) value).intValue();
-        if (fieldType == long.class) return ((Number) value).longValue();
-        if (fieldType == double.class) return ((Number) value).doubleValue();
-        if (fieldType == float.class) return ((Number) value).floatValue();
-        if (fieldType == boolean.class) return value;
-        if (fieldType == char.class) return value;
-        if (fieldType == short.class) return ((Number) value).shortValue();
-        if (fieldType == byte.class) return ((Number) value).byteValue();
-
-        throw new IllegalArgumentException("Unsupported primitive type: " + fieldType);
+    public LinkedList<Entity> getColumnValues(Object entity, DatabaseTable databaseTable) {
+        LinkedList<Entity> values = new LinkedList<>();
+        for (DatabaseColumn column : databaseTable.getDatabaseColumnList()) {
+            Field field;
+            try {
+                field = entity.getClass().getDeclaredField(column.name());
+                field.setAccessible(true);
+                values.add(new Entity(column.name(), field.get(entity)));
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new PersistenceException("No such field: " + column.name());
+            }
+        }
+        return values;
     }
 }
 
