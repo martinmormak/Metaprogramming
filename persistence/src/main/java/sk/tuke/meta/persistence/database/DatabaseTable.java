@@ -1,22 +1,27 @@
 package sk.tuke.meta.persistence.database;
 
+import sk.tuke.meta.persistence.PersistenceException;
+import sk.tuke.meta.persistence.annotations.Table;
+
 import java.util.*;
 
 public class DatabaseTable {
+    private final Table annotation;
     private final String name;
     private final List<DatabaseColumn> databaseColumnList;
     private List<String> foreignKeyList;
     private boolean created;
 
-    public DatabaseTable(String name, List<DatabaseColumn> databaseColumnList, boolean created) {
+    public DatabaseTable(Table annotation, String name, List<DatabaseColumn> databaseColumnList, boolean created) {
+        this.annotation = annotation;
         this.name = name;
         this.databaseColumnList = databaseColumnList;
         this.created = created;
         getForeignKeyList(databaseColumnList);
     }
 
-    public String getName() {
-        return name;
+    public String getSQLAlias() {
+        return annotation==null || annotation.name()==null || annotation.name().isEmpty()?name:annotation.name();
     }
 
     public List<DatabaseColumn> getDatabaseColumnList() {
@@ -45,8 +50,17 @@ public class DatabaseTable {
             Class<?> columnType = databaseColumn.type();
             if (!columnType.isPrimitive() && !columnType.equals(Integer.class) && !columnType.equals(Float.class)
                     && !columnType.equals(Double.class) && !columnType.equals(String.class)) {
-                foreignKeyList.add(databaseColumn.name());
+                foreignKeyList.add(databaseColumn.getSQLAlias());
             }
         }
+    }
+
+    public String getPrimaryKey() {
+        for(DatabaseColumn databaseColumn : databaseColumnList){
+            if(databaseColumn.isPrimaryKey()){
+                return databaseColumn.getSQLAlias();
+            }
+        }
+        throw new PersistenceException("Primary keys doesn't exists");
     }
 }

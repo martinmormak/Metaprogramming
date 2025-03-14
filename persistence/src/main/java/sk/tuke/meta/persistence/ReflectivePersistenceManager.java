@@ -19,7 +19,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
     @Override
     public void createTables(Class<?>... types) {
-        List<DatabaseTable> databaseTableList = tableReflection.createDatabaseTables(types);
+        /*List<DatabaseTable> databaseTableList = tableReflection.createDatabaseTables(types);
 
         boolean allTablesCreated;
         int loop = 0;
@@ -33,7 +33,15 @@ public class ReflectivePersistenceManager implements PersistenceManager {
                 }
             }
             loop++;
-        } while (!allTablesCreated && loop < types.length);
+        } while (!allTablesCreated && loop < types.length);*/
+        String[] statements = queryBuilder.getCreateTableQuery().split(";");
+
+        for (String statement : statements) {
+            statement = statement.trim();
+            if (!statement.isEmpty()) {
+                createTable(statement + ";"); // Ensure semicolon for each statement
+            }
+        }
     }
 
     @Override
@@ -95,25 +103,25 @@ public class ReflectivePersistenceManager implements PersistenceManager {
             return;
         }
 
-        long id = (long) tableReflection.getFieldValue(entity, databaseTable, "id");
+        Object PK = tableReflection.getFieldValue(entity, databaseTable, databaseTable.getPrimaryKey());
 
         try {
             if (!checkForeignKeysExists(entity, databaseTable)) {
                 throw new PersistenceException("Foreign keys doesn't exists");
             }
-            if (idExist(databaseTable, id)) {
+            if (PKExist(databaseTable, PK)) {
                 String updateQuery = queryBuilder.getUpdateQuery(databaseTable);
                 PreparedStatement preparedStatement = connection.prepareStatement(updateQuery);
-                tableReflection.prepareStatementWithExcludedList(tableReflection.prepareStatementWithExceptionList(entity, preparedStatement, databaseTable, List.of("id")), entity, preparedStatement, databaseTable, List.of("id"));
+                tableReflection.prepareStatementWithExcludedList(tableReflection.prepareStatementWithExceptionList(entity, preparedStatement, databaseTable, List.of(databaseTable.getPrimaryKey())), entity, preparedStatement, databaseTable, List.of(databaseTable.getPrimaryKey()));
                 preparedStatement.executeUpdate();
             } else {
                 String insertQuery = queryBuilder.getInsertQuery(databaseTable);
                 try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
-                    tableReflection.prepareStatementWithExceptionList(entity, preparedStatement, databaseTable, List.of("id"));
+                    tableReflection.prepareStatementWithExceptionList(entity, preparedStatement, databaseTable, List.of(databaseTable.getPrimaryKey()));
                     preparedStatement.execute();
                     ResultSet resultSet = preparedStatement.getGeneratedKeys();
                     if (resultSet.next()) {
-                        tableReflection.setField(entity, resultSet.getLong(1), "id");
+                        tableReflection.setField(entity, resultSet.getObject(1), databaseTable.getPrimaryKey());
                     }
                 }
             }
@@ -129,16 +137,16 @@ public class ReflectivePersistenceManager implements PersistenceManager {
             return;
         }
 
-        long id = (long) tableReflection.getFieldValue(entity, databaseTable, "id");
+        Object PK = tableReflection.getFieldValue(entity, databaseTable, databaseTable.getPrimaryKey());
 
-        if (!idExist(databaseTable, id)) {
+        if (!PKExist(databaseTable, PK)) {
             throw new PersistenceException("Object not found in database");
         }
 
         String deleteQuery = queryBuilder.getDeleteQuery(databaseTable);
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery)) {
-            tableReflection.prepareStatementWithExcludedList(entity, preparedStatement, databaseTable, List.of("id"));
+            tableReflection.prepareStatementWithExcludedList(entity, preparedStatement, databaseTable, List.of(databaseTable.getPrimaryKey()));
             preparedStatement.execute();
         } catch (SQLException e) {
             throw new PersistenceException("Error deleting entity", e);
@@ -153,6 +161,14 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         } catch (SQLException e) {
             databaseTable.setCreated(false);
             return false;
+        }
+    }
+
+    private void createTable(String SQLQuery) {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(SQLQuery);
+        } catch (SQLException e) {
+            throw new PersistenceException("Error executing SQL", e);
         }
     }
 
@@ -184,9 +200,9 @@ public class ReflectivePersistenceManager implements PersistenceManager {
                     return false;
                 }
 
-                long id = (long) tableReflection.getFieldValue(value, foreignDatabaseTable, "id");
-                if (id != 0) {
-                    if (!idExist(getDatabaseTable(value.getClass()), id)) {
+                Object PK = tableReflection.getFieldValue(value, foreignDatabaseTable, foreignDatabaseTable.getPrimaryKey());
+                if (PK != null) {
+                    if (!PKExist(getDatabaseTable(value.getClass()), PK)) {
                         return false;
                     }
                 } else {
@@ -200,10 +216,10 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         return true;
     }
 
-    private boolean idExist(DatabaseTable databaseTable, long id) {
+    private boolean PKExist(DatabaseTable databaseTable, Object PK) {
         String query = queryBuilder.getOneItemById(databaseTable);
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setLong(1, id);
+            preparedStatement.setObject(1, PK);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 return resultSet.next();
             }

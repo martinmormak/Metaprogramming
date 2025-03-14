@@ -2,4 +2,4 @@ rootProject.name = "assignment"
 include("example")
 include("persistence")
 include("annotations")
-include("annotations")
+include("processor")

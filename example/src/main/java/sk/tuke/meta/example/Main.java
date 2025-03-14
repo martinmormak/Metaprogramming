@@ -51,7 +51,7 @@ public class Main {
             System.out.println("  " + person.getDepartment());
         }
 
-        System.out.println("Delete Department");
+        /*System.out.println("Delete Department");
         manager.delete(department);
 
         persons = manager.getAll(Person.class);
@@ -67,6 +67,6 @@ public class Main {
         for (Person person : persons) {
             System.out.println(person);
             System.out.println("  " + person.getDepartment());
-        }
+        }*/
     }
 }

@@ -1,5 +1,5 @@
 plugins {
-    id("java-library")
+    id("java")
 }
 
 group = "sk.tuke.meta"
@@ -16,9 +16,9 @@ repositories {
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.9.1"))
+    implementation(project(":annotations"))
+    testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.test {

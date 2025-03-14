@@ -2,6 +2,9 @@ package sk.tuke.meta.persistence.reflection;
 
 import sk.tuke.meta.persistence.PersistenceException;
 import sk.tuke.meta.persistence.PersistenceManager;
+import sk.tuke.meta.persistence.annotations.Column;
+import sk.tuke.meta.persistence.annotations.Id;
+import sk.tuke.meta.persistence.annotations.Table;
 import sk.tuke.meta.persistence.database.DatabaseColumn;
 import sk.tuke.meta.persistence.database.DatabaseTable;
 import sk.tuke.meta.persistence.entity.Entity;
@@ -21,9 +24,25 @@ public class TableReflection {
     }
 
     private List<DatabaseColumn> createDatabaseColumns(Class<?> type) {
+        boolean isPrimaryKeyPresent = false;
         List<DatabaseColumn> databaseColumnsList = new LinkedList<>();
         for (Field field : type.getDeclaredFields()) {
-            databaseColumnsList.add(new DatabaseColumn(field.getType(), field.getName()));
+            if (field.isAnnotationPresent(Column.class)) {
+                if(field.isAnnotationPresent(Id.class)){
+                    if(isPrimaryKeyPresent){
+                        throw new PersistenceException("More ten one primary key in table " + type.getName());
+                    }
+                    isPrimaryKeyPresent = true;
+                    databaseColumnsList.add(new DatabaseColumn(field.getType(), field.getAnnotation(Column.class), field.getName(), true));
+                } else {
+                    databaseColumnsList.add(new DatabaseColumn(field.getType(), field.getAnnotation(Column.class), field.getName(), false));
+                }
+            }else {
+                System.out.println("Column " + type.getSimpleName() + " in table " + type.getName() + " is not annotated with @Column");
+            }
+        }
+        if(!isPrimaryKeyPresent){
+            throw new PersistenceException("Not found primary key in table" + type.getName());
         }
         return databaseColumnsList;
     }
@@ -31,14 +50,21 @@ public class TableReflection {
     public List<DatabaseTable> createDatabaseTables(Class<?>... types) {
         List<DatabaseTable> databaseTableList = new ArrayList<>();
         for (Class<?> type : types) {
-            databaseTableList.add(createDatabaseTable(type));
+            if(type.isAnnotationPresent(Table.class)){
+                databaseTableList.add(createDatabaseTable(type));
+            }else {
+                throw new PersistenceException("Table " + type.getSimpleName() + " is not annotated with @Table");
+            }
         }
         databaseTableList.sort(Comparator.comparing(DatabaseTable::getForeignKeyListSize));
         return databaseTableList;
     }
 
     public DatabaseTable createDatabaseTable(Class<?> type) {
-        return new DatabaseTable(type.getSimpleName(), createDatabaseColumns(type), false);
+        if(type.isAnnotationPresent(Table.class)){
+            return new DatabaseTable(type.getAnnotation(Table.class), type.getSimpleName(), createDatabaseColumns(type), false);
+        }
+        throw new PersistenceException("Table " + type.getSimpleName() + " is not annotated with @Table");
     }
 
     public <T> int prepareStatementWithExceptionList(T entity, PreparedStatement preparedStatement, DatabaseTable databaseTable, List<String> exceptionList) {
@@ -75,8 +101,8 @@ public class TableReflection {
     public <T> int prepareStatementWithExcludedList(int index, T entity, PreparedStatement preparedStatement, DatabaseTable databaseTable, List<String> excludedList) {
         List<String> exceptionList = new ArrayList<>();
         for (DatabaseColumn databaseColumn : databaseTable.getDatabaseColumnList()) {
-            if (!excludedList.contains(databaseColumn.name())) {
-                exceptionList.add(databaseColumn.name());
+            if (!excludedList.contains(databaseColumn.getSQLAlias())) {
+                exceptionList.add(databaseColumn.getSQLAlias());
             }
         }
         return prepareStatementWithExceptionList(index, entity, preparedStatement, databaseTable, exceptionList);
@@ -120,17 +146,17 @@ public class TableReflection {
                 Object value;
 
                 if (field.getType() == int.class || field.getType() == Integer.class) {
-                    value = resultSet.getInt(databaseColumn.name());
+                    value = resultSet.getInt(databaseColumn.getSQLAlias());
                 } else if (field.getType() == long.class || field.getType() == Long.class) {
-                    value = resultSet.getLong(databaseColumn.name());
+                    value = resultSet.getLong(databaseColumn.getSQLAlias());
                 } else if (field.getType() == double.class || field.getType() == Double.class) {
-                    value = resultSet.getDouble(databaseColumn.name());
+                    value = resultSet.getDouble(databaseColumn.getSQLAlias());
                 } else if (field.getType() == String.class) {
-                    value = resultSet.getString(databaseColumn.name());
+                    value = resultSet.getString(databaseColumn.getSQLAlias());
                 } else {
-                    value = resultSet.getObject(databaseColumn.name());
-                    if (databaseTable.getForeignKeyList().contains(databaseColumn.name())) {
-                        Optional<?> optionalValue = persistenceManager.get(field.getType(), resultSet.getLong(databaseColumn.name()));
+                    value = resultSet.getObject(databaseColumn.getSQLAlias());
+                    if (databaseTable.getForeignKeyList().contains(databaseColumn.getSQLAlias())) {
+                        Optional<?> optionalValue = persistenceManager.get(field.getType(), resultSet.getLong(databaseColumn.getSQLAlias()));
                         value = optionalValue.orElse(null);
                     }
                 }
@@ -150,7 +176,7 @@ public class TableReflection {
             try {
                 field = entity.getClass().getDeclaredField(column.name());
                 field.setAccessible(true);
-                values.add(new Entity(column.name(), field.get(entity)));
+                values.add(new Entity(column.getSQLAlias(), field.get(entity)));
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 throw new PersistenceException("No such field: " + column.name());
             }
