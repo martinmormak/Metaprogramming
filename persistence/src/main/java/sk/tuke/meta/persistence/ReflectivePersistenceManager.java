@@ -2,6 +2,7 @@ package sk.tuke.meta.persistence;
 
 import sk.tuke.meta.persistence.database.DatabaseTable;
 import sk.tuke.meta.persistence.database.query.QueryBuilder;
+import sk.tuke.meta.persistence.entity.FKNameEntity;
 import sk.tuke.meta.persistence.reflection.TableReflection;
 
 import java.lang.reflect.Field;
@@ -126,7 +127,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
                 }
             }
         } catch (SQLException e) {
-            throw new PersistenceException("ID field not found", e);
+            throw new PersistenceException("ID field not found for entity " + entity, e);
         }
     }
 
@@ -189,9 +190,9 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     }
 
     private <T> boolean checkForeignKeysExists(T entity, DatabaseTable databaseTable) {
-        for (String fieldName : databaseTable.getForeignKeyList()) {
+        for (FKNameEntity fieldName : databaseTable.getForeignKeyList()) {
             try {
-                Field field = entity.getClass().getDeclaredField(fieldName);
+                Field field = entity.getClass().getDeclaredField(fieldName.javaName());
                 field.setAccessible(true);
                 Object value = field.get(entity);
 

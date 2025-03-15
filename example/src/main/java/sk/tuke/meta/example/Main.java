@@ -30,14 +30,15 @@ public class Main {
 
         System.out.println("Save Hrasko");
         Person hrasko = new Person("Janko", "Hrasko", 30);
-        hrasko.setDepartment(department);
+        hrasko.setIDepartment(department);
         manager.save(hrasko);
 
         System.out.println("List All Persons");
         List<Person> persons = manager.getAll(Person.class);
         for (Person person : persons) {
             System.out.println(person);
-            System.out.println("  " + person.getDepartment());
+            IDepartment personIDepartment = person.getIDepartment();
+            System.out.println("  " + personIDepartment.toString());
         }
         Optional<Department> anotherDepartment = manager.get(Department.class, 100);
         System.out.println(anotherDepartment.isPresent());
@@ -48,7 +49,8 @@ public class Main {
         persons = manager.getAll(Person.class);
         for (Person person : persons) {
             System.out.println(person);
-            System.out.println("  " + person.getDepartment());
+            IDepartment personIDepartment = person.getIDepartment();
+            System.out.println("  " + personIDepartment.toString());
         }
 
         /*System.out.println("Delete Department");

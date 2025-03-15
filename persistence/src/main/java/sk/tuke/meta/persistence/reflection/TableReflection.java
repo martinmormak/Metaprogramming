@@ -8,6 +8,8 @@ import sk.tuke.meta.persistence.annotations.Table;
 import sk.tuke.meta.persistence.database.DatabaseColumn;
 import sk.tuke.meta.persistence.database.DatabaseTable;
 import sk.tuke.meta.persistence.entity.Entity;
+import sk.tuke.meta.persistence.entity.FKNameEntity;
+import sk.tuke.meta.persistence.proxy.LazyProxyHandler;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -76,7 +78,7 @@ public class TableReflection {
         for (Entity columnEntity : columnEntities) {
             if (!exceptionList.contains(columnEntity.name())) {
                 try {
-                    if(!databaseTable.getForeignKeyList().contains(columnEntity.name())) {
+                    if(!checkIfItIsFKObject(databaseTable, columnEntity)) {
                         preparedStatement.setObject(index++, columnEntity.value());
                     } else {
                         DatabaseTable foreignDatabaseTable = this.createDatabaseTable(columnEntity.value().getClass());
@@ -135,7 +137,7 @@ public class TableReflection {
         }
     }
 
-    public <T> T getInstanceFromDatabase(Class<T> type, ResultSet resultSet, DatabaseTable databaseTable) {
+    /*public <T> T getInstanceFromDatabase(Class<T> type, ResultSet resultSet, DatabaseTable databaseTable) {
         try {
             T instance = type.getDeclaredConstructor().newInstance();
             List<DatabaseColumn> databaseColumns = databaseTable.getDatabaseColumnList();
@@ -167,6 +169,54 @@ public class TableReflection {
                  NoSuchMethodException | NoSuchFieldException e) {
             throw new PersistenceException("Error executing SQL", e);
         }
+    }*/
+
+    public <T> T getInstanceFromDatabase(Class<T> type, ResultSet resultSet, DatabaseTable databaseTable) {
+        try {
+            T instance = type.getDeclaredConstructor().newInstance();
+            List<DatabaseColumn> databaseColumns = databaseTable.getDatabaseColumnList();
+
+            for (DatabaseColumn databaseColumn : databaseColumns) {
+                Field field = type.getDeclaredField(databaseColumn.name());
+                field.setAccessible(true);
+                Object value;
+
+                if (field.getType() == int.class || field.getType() == Integer.class) {
+                    value = resultSet.getInt(databaseColumn.getSQLAlias());
+                } else if (field.getType() == long.class || field.getType() == Long.class) {
+                    value = resultSet.getLong(databaseColumn.getSQLAlias());
+                } else if (field.getType() == double.class || field.getType() == Double.class) {
+                    value = resultSet.getDouble(databaseColumn.getSQLAlias());
+                } else if (field.getType() == String.class) {
+                    value = resultSet.getString(databaseColumn.getSQLAlias());
+                } else {
+                    value = resultSet.getObject(databaseColumn.getSQLAlias());
+
+                    if (checkIfItIsFKObject(databaseTable, databaseColumn.getSQLAlias())) {
+                        Column columnAnnotation = field.getAnnotation(Column.class);
+
+                        if (columnAnnotation != null && columnAnnotation.lazyFetch() && field.getType().isInterface()) {
+                            // Vytvorenie proxy na oneskorené načítanie
+                            long foreignKeyId = resultSet.getLong(databaseColumn.getSQLAlias());
+                            value = LazyProxyHandler.createProxy(
+                                    field.getType(),
+                                    columnAnnotation.targetClass(),
+                                    () -> persistenceManager.get(columnAnnotation.targetClass(), foreignKeyId).orElse(null)
+                            );
+                        } else {
+                            // Bežné načítanie cudzieho kľúča
+                            Optional<?> optionalValue = persistenceManager.get(field.getType(), resultSet.getLong(databaseColumn.getSQLAlias()));
+                            value = optionalValue.orElse(null);
+                        }
+                    }
+                }
+                field.set(instance, value);
+            }
+            return instance;
+        } catch (SQLException | InvocationTargetException | IllegalAccessException | InstantiationException |
+                 NoSuchMethodException | NoSuchFieldException e) {
+            throw new PersistenceException("Error executing SQL", e);
+        }
     }
 
     public LinkedList<Entity> getColumnValues(Object entity, DatabaseTable databaseTable) {
@@ -182,6 +232,30 @@ public class TableReflection {
             }
         }
         return values;
+    }
+
+    private boolean checkIfItIsFKObject(DatabaseTable databaseTable, Entity columnEntity) {
+        for(FKNameEntity fkNameEntity : databaseTable.getForeignKeyList()) {
+            if(fkNameEntity.SQLAlias().contains(columnEntity.name())){
+                return true;
+            }
+            if(fkNameEntity.javaName().contains(columnEntity.name())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean checkIfItIsFKObject(DatabaseTable databaseTable, String columnName) {
+        for(FKNameEntity fkNameEntity : databaseTable.getForeignKeyList()) {
+            if(fkNameEntity.SQLAlias().contains(columnName)){
+                return true;
+            }
+            if(fkNameEntity.javaName().contains(columnName)){
+                return true;
+            }
+        }
+        return false;
     }
 }
 

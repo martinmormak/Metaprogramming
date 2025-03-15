@@ -2,6 +2,7 @@ package sk.tuke.meta.persistence.database;
 
 import sk.tuke.meta.persistence.PersistenceException;
 import sk.tuke.meta.persistence.annotations.Table;
+import sk.tuke.meta.persistence.entity.FKNameEntity;
 
 import java.util.*;
 
@@ -9,7 +10,7 @@ public class DatabaseTable {
     private final Table annotation;
     private final String name;
     private final List<DatabaseColumn> databaseColumnList;
-    private List<String> foreignKeyList;
+    private List<FKNameEntity> foreignKeyList;
     private boolean created;
 
     public DatabaseTable(Table annotation, String name, List<DatabaseColumn> databaseColumnList, boolean created) {
@@ -32,7 +33,7 @@ public class DatabaseTable {
         return foreignKeyList.size();
     }
 
-    public List<String> getForeignKeyList() {
+    public List<FKNameEntity> getForeignKeyList() {
         return foreignKeyList;
     }
 
@@ -50,7 +51,7 @@ public class DatabaseTable {
             Class<?> columnType = databaseColumn.type();
             if (!columnType.isPrimitive() && !columnType.equals(Integer.class) && !columnType.equals(Float.class)
                     && !columnType.equals(Double.class) && !columnType.equals(String.class)) {
-                foreignKeyList.add(databaseColumn.getSQLAlias());
+                foreignKeyList.add(new FKNameEntity(databaseColumn.name(), databaseColumn.getSQLAlias()));
             }
         }
     }
