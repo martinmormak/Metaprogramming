@@ -38,7 +38,7 @@ public class Main {
         for (Person person : persons) {
             System.out.println(person);
             IDepartment personIDepartment = person.getIDepartment();
-            System.out.println("  " + personIDepartment.toString());
+            System.out.println("- " + personIDepartment.toString());
         }
         Optional<Department> anotherDepartment = manager.get(Department.class, 100);
         System.out.println(anotherDepartment.isPresent());
@@ -50,7 +50,7 @@ public class Main {
         for (Person person : persons) {
             System.out.println(person);
             IDepartment personIDepartment = person.getIDepartment();
-            System.out.println("  " + personIDepartment.toString());
+            System.out.println("- " + personIDepartment.toString());
         }
 
         /*System.out.println("Delete Department");

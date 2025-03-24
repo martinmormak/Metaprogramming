@@ -51,7 +51,11 @@ public class DatabaseTable {
             Class<?> columnType = databaseColumn.type();
             if (!columnType.isPrimitive() && !columnType.equals(Integer.class) && !columnType.equals(Float.class)
                     && !columnType.equals(Double.class) && !columnType.equals(String.class)) {
-                foreignKeyList.add(new FKNameEntity(databaseColumn.name(), databaseColumn.getSQLAlias()));
+                if(databaseColumn.annotation().targetClass()!=null) {
+                    foreignKeyList.add(new FKNameEntity(databaseColumn.name(), databaseColumn.getSQLAlias(), databaseColumn.annotation().targetClass()));
+                } else {
+                    foreignKeyList.add(new FKNameEntity(databaseColumn.name(), databaseColumn.getSQLAlias(), databaseColumn.getClass()));
+                }
             }
         }
     }
