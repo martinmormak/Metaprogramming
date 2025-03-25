@@ -99,7 +99,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
     @Override
     public <T> void save(T entity) {
-        System.out.println("My debug output:" + entity);
+        System.out.println("My debug output:" + getEntityDetails(entity));
         DatabaseTable databaseTable = getDatabaseTable(entity.getClass());
         if(databaseTable == null) {
             return;
@@ -134,7 +134,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
     @Override
     public void delete(Object entity) {
-        System.out.println("My debug output:" + entity);
+        System.out.println("My debug output:" + getEntityDetails(entity));
         DatabaseTable databaseTable = getDatabaseTable(entity.getClass());
         if(databaseTable == null) {
             return;
@@ -229,6 +229,20 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         } catch (SQLException e) {
             return false;
         }
+    }
+
+    private String getEntityDetails(Object entity) {
+        StringBuilder sb = new StringBuilder(entity.getClass().getSimpleName() + " { ");
+        for (Field field : entity.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                sb.append(field.getName()).append("=").append(field.get(entity)).append(", ");
+            } catch (IllegalAccessException e) {
+                sb.append(field.getName()).append("=ACCESS DENIED, ");
+            }
+        }
+        sb.append("}");
+        return sb.toString();
     }
 
 }
