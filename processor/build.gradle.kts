@@ -2,13 +2,12 @@ plugins {
     id("java")
 }
 
-group = "sk.tuke.meta"
+group = "sk.tuke.meta.persistence"
 version = "1.0-SNAPSHOT"
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 repositories {
@@ -17,6 +16,7 @@ repositories {
 
 dependencies {
     implementation(project(":annotations"))
+    implementation(project(":persistence"))
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
