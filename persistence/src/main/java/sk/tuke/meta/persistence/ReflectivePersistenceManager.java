@@ -236,7 +236,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         for (Field field : entity.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             try {
-                sb.append(field.getName()).append("=").append(field.get(entity)).append(", ");
+                sb.append(field.getName()).append("-").append(field.getType()).append("=").append(field.get(entity)).append(", ");
             } catch (IllegalAccessException e) {
                 sb.append(field.getName()).append("=ACCESS DENIED, ");
             }
