@@ -9,7 +9,7 @@ import sk.tuke.meta.persistence.database.DatabaseColumn;
 import sk.tuke.meta.persistence.database.DatabaseTable;
 import sk.tuke.meta.persistence.entity.Entity;
 import sk.tuke.meta.persistence.entity.FKNameEntity;
-import sk.tuke.meta.persistence.proxy.LazyProxyHandler;
+import sk.tuke.meta.persistence.LazyProxyHandler;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
