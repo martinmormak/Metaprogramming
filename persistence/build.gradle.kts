@@ -17,7 +17,6 @@ repositories {
 
 dependencies {
     api(project(":annotations"))
-    implementation(project(":proxy"))
     api("org.xerial:sqlite-jdbc:3.49.0.0")
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
