@@ -53,13 +53,16 @@ public class Main {
             System.out.println("- " + personIDepartment.toString());
         }
 
-        /*System.out.println("Delete Department");
+        System.out.println("Delete Department");
         manager.delete(department);
 
         persons = manager.getAll(Person.class);
         for (Person person : persons) {
             System.out.println(person);
-            System.out.println("  " + person.getDepartment());
+            IDepartment personIDepartment = person.getIDepartment();
+            if (personIDepartment == null) {
+                System.out.println("- " + personIDepartment.toString());
+            }
         }
 
         System.out.println("Delete Hrasko");
@@ -68,7 +71,10 @@ public class Main {
         persons = manager.getAll(Person.class);
         for (Person person : persons) {
             System.out.println(person);
-            System.out.println("  " + person.getDepartment());
-        }*/
+            IDepartment personIDepartment = person.getIDepartment();
+            if (personIDepartment == null) {
+                System.out.println("- " + personIDepartment.toString());
+            }
+        }
     }
 }

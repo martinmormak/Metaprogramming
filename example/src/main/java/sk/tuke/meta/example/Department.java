@@ -7,7 +7,7 @@ import sk.tuke.meta.persistence.annotations.Table;
 @Table(name = "Oddelenie")
 public class Department implements IDepartment {
     @Id
-    @Column
+    @Column(name = "identificator")
     private long id;
     @Column
     private String name;

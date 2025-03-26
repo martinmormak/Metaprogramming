@@ -109,7 +109,7 @@ public class QueryBuilder {
         query.append("?, ".repeat(Math.max(0, databaseTable.getDatabaseColumnList().size() - 1)));
         query.deleteCharAt(query.length() - 1);
         query.deleteCharAt(query.length() - 1);
-        query.append(") RETURNING ").append(primaryKeyName);
+        query.append(") RETURNING \"").append(primaryKeyName).append("\"");
         return  query.toString();
     }
 
