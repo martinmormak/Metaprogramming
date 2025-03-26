@@ -99,7 +99,11 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
     @Override
     public <T> void save(T entity) {
-        System.out.println("My debug output:" + getEntityDetails(entity));
+        try {
+            System.out.println("My debug output:" + getEntityDetails(entity));
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
         DatabaseTable databaseTable = getDatabaseTable(entity.getClass());
         if(databaseTable == null) {
             return;
@@ -134,7 +138,11 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
     @Override
     public void delete(Object entity) {
-        System.out.println("My debug output:" + getEntityDetails(entity));
+        try {
+            System.out.println("My debug output:" + getEntityDetails(entity));
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
         DatabaseTable databaseTable = getDatabaseTable(entity.getClass());
         if(databaseTable == null) {
             return;
