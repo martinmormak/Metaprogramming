@@ -232,6 +232,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     }
 
     private String getEntityDetails(Object entity) {
+        System.out.println("My debug output:" + entity);
         StringBuilder sb = new StringBuilder(entity.getClass().getSimpleName() + " { ");
         for (Field field : entity.getClass().getDeclaredFields()) {
             field.setAccessible(true);

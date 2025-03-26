@@ -15,6 +15,10 @@ public class LazyProxyHandler<T> implements InvocationHandler {
         this.loader = loader;
     }
 
+    public boolean isInitialized() {
+        return realObject != null;
+    }
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (realObject == null) {

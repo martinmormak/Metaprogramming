@@ -11,8 +11,11 @@ import sk.tuke.meta.persistence.entity.Entity;
 import sk.tuke.meta.persistence.entity.FKNameEntity;
 import sk.tuke.meta.persistence.LazyProxyHandler;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Proxy;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -85,7 +88,21 @@ public class TableReflection {
                         if (foreignDatabaseTable == null) {
                             throw new PersistenceException("Cannot get id from foreign database table");
                         }
-                        long id = (long) this.getFieldValue(columnEntity.value(), foreignDatabaseTable, "id");
+
+                        Object foreignValue = columnEntity.value();
+
+                        if (Proxy.isProxyClass(entity.getClass())) {
+                            InvocationHandler handler = Proxy.getInvocationHandler(entity);
+
+                            if (handler instanceof LazyProxyHandler<?>) {
+                                LazyProxyHandler lazyHandler = (LazyProxyHandler) handler;
+                                if (!lazyHandler.isInitialized()) {
+                                    throw new PersistenceException("Lazy-loaded proxy is not initialized.");
+                                }
+                            }
+                        }
+
+                        long id = (long) this.getFieldValue(foreignValue, foreignDatabaseTable, "id");
                         preparedStatement.setObject(index++, id);
                     }
                 } catch (SQLException e) {
