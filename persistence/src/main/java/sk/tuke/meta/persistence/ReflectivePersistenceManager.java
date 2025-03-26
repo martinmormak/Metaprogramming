@@ -6,6 +6,8 @@ import sk.tuke.meta.persistence.entity.FKNameEntity;
 import sk.tuke.meta.persistence.reflection.TableReflection;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.sql.*;
 import java.util.*;
 
@@ -103,6 +105,17 @@ public class ReflectivePersistenceManager implements PersistenceManager {
             System.out.println("My debug output:" + getEntityDetails(entity));
         } catch (Exception e){
             System.out.println(e.getMessage());
+        }
+        if (Proxy.isProxyClass(entity.getClass())) {
+            InvocationHandler handler = Proxy.getInvocationHandler(entity);
+
+            if (handler instanceof LazyProxyHandler<?>) {
+                LazyProxyHandler lazyHandler = (LazyProxyHandler) handler;
+                if (!lazyHandler.isInitialized()) {
+                    throw new PersistenceException("Lazy-loaded proxy is not initialized.");
+                }
+                entity = (T) lazyHandler.getRealObject();
+            }
         }
         DatabaseTable databaseTable = getDatabaseTable(entity.getClass());
         if(databaseTable == null) {

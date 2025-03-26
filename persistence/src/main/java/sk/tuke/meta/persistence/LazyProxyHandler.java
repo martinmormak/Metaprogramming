@@ -19,6 +19,14 @@ public class LazyProxyHandler<T> implements InvocationHandler {
         return realObject != null;
     }
 
+    public T getRealObject() {
+        return realObject;
+    }
+
+    public Class<T> getTargetClass() {
+        return targetClass;
+    }
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (realObject == null) {
