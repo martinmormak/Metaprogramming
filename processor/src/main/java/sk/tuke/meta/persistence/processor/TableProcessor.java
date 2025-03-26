@@ -71,6 +71,7 @@ public class TableProcessor extends AbstractProcessor {
                                 break;
                             default:
                                 columnType = "INTEGER";
+                                if(column==null) continue;
                                 TypeMirror targetTypeMirror = getTargetTypeMirror(column);
                                 if (targetTypeMirror != null) {
                                     Element targetElement = processingEnv.getTypeUtils().asElement(targetTypeMirror);

@@ -106,23 +106,30 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         } catch (Exception e){
             System.out.println(e.getMessage());
         }
+        DatabaseTable databaseTable = null;
+        Object realObject = null;
         if (Proxy.isProxyClass(entity.getClass())) {
             InvocationHandler handler = Proxy.getInvocationHandler(entity);
 
             if (handler instanceof LazyProxyHandler<?>) {
                 LazyProxyHandler lazyHandler = (LazyProxyHandler) handler;
                 if (!lazyHandler.isInitialized()) {
-                    throw new PersistenceException("Lazy-loaded proxy is not initialized.");
+                    return;
                 }
-                entity = (T) lazyHandler.getRealObject();
+                databaseTable = getDatabaseTable(lazyHandler.getTargetClass());
+                realObject = lazyHandler.getRealObject();
             }
         }
-        DatabaseTable databaseTable = getDatabaseTable(entity.getClass());
+        if(databaseTable == null) {
+            databaseTable = getDatabaseTable(entity.getClass());
+            realObject = entity;
+        }
+
         if(databaseTable == null) {
             return;
         }
 
-        Object PK = tableReflection.getFieldValue(entity, databaseTable, databaseTable.getPrimaryKey());
+        Object PK = tableReflection.getFieldValue(realObject, databaseTable, databaseTable.getPrimaryKey());
 
         try {
             if (!checkForeignKeysExists(entity, databaseTable)) {
@@ -156,12 +163,30 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         } catch (Exception e){
             System.out.println(e.getMessage());
         }
-        DatabaseTable databaseTable = getDatabaseTable(entity.getClass());
+        DatabaseTable databaseTable = null;
+        Object realObject = null;
+        if (Proxy.isProxyClass(entity.getClass())) {
+            InvocationHandler handler = Proxy.getInvocationHandler(entity);
+
+            if (handler instanceof LazyProxyHandler<?>) {
+                LazyProxyHandler lazyHandler = (LazyProxyHandler) handler;
+                if (!lazyHandler.isInitialized()) {
+                    return;
+                }
+                databaseTable = getDatabaseTable(lazyHandler.getTargetClass());
+                realObject = lazyHandler.getRealObject();
+            }
+        }
+        if(databaseTable == null) {
+            databaseTable = getDatabaseTable(entity.getClass());
+            realObject = entity;
+        }
+
         if(databaseTable == null) {
             return;
         }
 
-        Object PK = tableReflection.getFieldValue(entity, databaseTable, databaseTable.getPrimaryKey());
+        Object PK = tableReflection.getFieldValue(realObject, databaseTable, databaseTable.getPrimaryKey());
 
         if (!PKExist(databaseTable, PK)) {
             throw new PersistenceException("Object not found in database");
@@ -252,7 +277,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         }
     }
 
-    private String getEntityDetails(Object entity) {
+    public static String getEntityDetails(Object entity) {
         System.out.println("My debug output:" + entity);
         StringBuilder sb = new StringBuilder(entity.getClass().getSimpleName() + " { ");
         for (Field field : entity.getClass().getDeclaredFields()) {

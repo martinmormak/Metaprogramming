@@ -20,6 +20,9 @@ public class LazyProxyHandler<T> implements InvocationHandler {
     }
 
     public T getRealObject() {
+        if(realObject == null) {
+            realObject = loader.get();
+        }
         return realObject;
     }
 

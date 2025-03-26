@@ -12,11 +12,15 @@ import sk.tuke.meta.persistence.entity.FKNameEntity;
 import sk.tuke.meta.persistence.LazyProxyHandler;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Proxy;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+
+import static sk.tuke.meta.persistence.ReflectivePersistenceManager.getEntityDetails;
 
 public class TableReflection {
     PersistenceManager persistenceManager;
@@ -85,7 +89,22 @@ public class TableReflection {
                         if (foreignDatabaseTable == null) {
                             throw new PersistenceException("Cannot get id from foreign database table");
                         }
-                        long id = (long) this.getFieldValue(columnEntity.value(), foreignDatabaseTable, "id");
+                        long id = -1;
+                        if (Proxy.isProxyClass(entity.getClass())) {
+                            InvocationHandler handler = Proxy.getInvocationHandler(entity);
+
+                            if (handler instanceof LazyProxyHandler<?>) {
+                                LazyProxyHandler lazyHandler = (LazyProxyHandler) handler;
+                                if (!lazyHandler.isInitialized()) {
+                                    return -1;
+                                }
+                                foreignDatabaseTable = createDatabaseTable(lazyHandler.getTargetClass());
+                                id = (long) this.getFieldValue(lazyHandler.getRealObject(), foreignDatabaseTable, foreignDatabaseTable.getPrimaryKey());
+                            }
+                        }
+                        if(id == -1) {
+                            id = (long) this.getFieldValue(columnEntity.value(), foreignDatabaseTable, foreignDatabaseTable.getPrimaryKey());
+                        }
                         preparedStatement.setObject(index++, id);
                     }
                 } catch (SQLException e) {
@@ -111,6 +130,11 @@ public class TableReflection {
     }
 
     public <T> Object getFieldValue(T entity, DatabaseTable databaseTable, String fieldName) {
+        try {
+            System.out.println("My debug output:" + getEntityDetails(entity));
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
         return getColumnValues(entity,databaseTable).stream()
                 .filter(columnEntity -> columnEntity.name().equals(fieldName))
                 .map(Entity::value)
