@@ -166,8 +166,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         } catch (Exception e){
             System.out.println(e.getMessage());
         }
-        DatabaseTable databaseTable = null;
-        Object realObject = null;
+        DatabaseTable databaseTable = tableReflection.createDatabaseTable(entity.getClass());
         Object PK = null;
         if (Proxy.isProxyClass(entity.getClass())) {
             InvocationHandler handler = Proxy.getInvocationHandler(entity);
@@ -177,7 +176,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
             }
         }
         if(PK == null) {
-            PK = tableReflection.getFieldValue(realObject, databaseTable, databaseTable.getPrimaryKey());
+            PK = tableReflection.getFieldValue(entity, databaseTable, databaseTable.getPrimaryKey());
         }
 
         if (!PKExist(databaseTable, PK)) {
@@ -187,9 +186,8 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         String deleteQuery = queryBuilder.getDeleteQuery(databaseTable);
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery)) {
-            if(tableReflection.prepareStatementWithExcludedList(realObject, preparedStatement, databaseTable, List.of(databaseTable.getPrimaryKey())) == -1){
-                return;
-            }
+
+            preparedStatement.setObject(1, PK);
             preparedStatement.execute();
         } catch (SQLException e) {
             throw new PersistenceException("Error deleting entity", e);
