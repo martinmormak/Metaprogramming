@@ -131,7 +131,7 @@ public class TableReflection {
 
     public <T> Object getFieldValue(T entity, DatabaseTable databaseTable, String fieldName) {
         try {
-            System.out.println("My debug output:" + getEntityDetails(entity));
+            System.out.println("My debug output getFieldValue:" + getEntityDetails(entity));
         } catch (Exception e){
             System.out.println(e.getMessage());
         }
@@ -248,11 +248,14 @@ public class TableReflection {
         for (DatabaseColumn column : databaseTable.getDatabaseColumnList()) {
             Field field;
             try {
+                System.out.println("Looking for field");
                 field = entity.getClass().getDeclaredField(column.name());
+                System.out.println("Field found setting accessible");
                 field.setAccessible(true);
+                System.out.println("Field accessible assigning values");
                 values.add(new Entity(column.getSQLAlias(), field.get(entity)));
             } catch (NoSuchFieldException | IllegalAccessException e) {
-                throw new PersistenceException("No such field: " + column.name());
+                throw new PersistenceException("No such field: " + column.name(),e);
             }
         }
         return values;

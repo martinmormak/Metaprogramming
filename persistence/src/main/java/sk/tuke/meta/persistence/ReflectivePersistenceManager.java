@@ -102,7 +102,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     @Override
     public <T> void save(T entity) {
         try {
-            System.out.println("My debug output:" + getEntityDetails(entity));
+            System.out.println("My debug output save:" + getEntityDetails(entity));
         } catch (Exception e){
             System.out.println(e.getMessage());
         }
@@ -159,7 +159,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     @Override
     public void delete(Object entity) {
         try {
-            System.out.println("My debug output:" + getEntityDetails(entity));
+            System.out.println("My debug output delete:" + getEntityDetails(entity));
         } catch (Exception e){
             System.out.println(e.getMessage());
         }
@@ -278,7 +278,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     }
 
     public static String getEntityDetails(Object entity) {
-        System.out.println("My debug output:" + entity);
+        System.out.println("My debug output getEntityDetails:" + entity);
         StringBuilder sb = new StringBuilder(entity.getClass().getSimpleName() + " { ");
         for (Field field : entity.getClass().getDeclaredFields()) {
             field.setAccessible(true);
