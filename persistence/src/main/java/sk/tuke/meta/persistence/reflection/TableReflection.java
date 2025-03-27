@@ -79,6 +79,9 @@ public class TableReflection {
     }
 
     public <T> int prepareStatementWithExceptionList(int index, T entity, PreparedStatement preparedStatement, DatabaseTable databaseTable, List<String> exceptionList) {
+        if(index == -1){
+            return -1;
+        }
         LinkedList<Entity> columnEntities = getColumnValues(entity,databaseTable);
         for (Entity columnEntity : columnEntities) {
             if (!exceptionList.contains(columnEntity.name())) {
