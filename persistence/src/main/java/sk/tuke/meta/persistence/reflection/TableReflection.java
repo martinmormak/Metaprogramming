@@ -245,6 +245,11 @@ public class TableReflection {
     }
 
     public LinkedList<Entity> getColumnValues(Object entity, DatabaseTable databaseTable) {
+        try {
+            System.out.println("My debug output getColumnValues:" + getEntityDetails(entity));
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
         LinkedList<Entity> values = new LinkedList<>();
         for (DatabaseColumn column : databaseTable.getDatabaseColumnList()) {
             Field field;
