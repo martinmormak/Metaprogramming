@@ -11,6 +11,7 @@ import sk.tuke.meta.persistence.entity.Entity;
 import sk.tuke.meta.persistence.entity.FKNameEntity;
 import sk.tuke.meta.persistence.LazyProxyHandler;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -256,7 +257,10 @@ public class TableReflection {
                 values.add(new Entity(column.getSQLAlias(), field.get(entity)));
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 for (Field field1 : entity.getClass().getDeclaredFields()) {
-                    System.out.println(field1.getName());
+                    System.out.println("Found field" + field1.getName());
+                    for(Annotation annotation : field1.getAnnotations()) {
+                        System.out.println("Field annotation"+annotation);
+                    }
                 }
                 throw new PersistenceException("No such field: " + column.name(),e);
             }
