@@ -132,22 +132,22 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         Object PK = tableReflection.getFieldValue(realObject, databaseTable, databaseTable.getPrimaryKey());
 
         try {
-            if (!checkForeignKeysExists(entity, databaseTable)) {
+            if (!checkForeignKeysExists(realObject, databaseTable)) {
                 throw new PersistenceException("Foreign keys doesn't exists");
             }
             if (PKExist(databaseTable, PK)) {
                 String updateQuery = queryBuilder.getUpdateQuery(databaseTable);
                 PreparedStatement preparedStatement = connection.prepareStatement(updateQuery);
-                tableReflection.prepareStatementWithExcludedList(tableReflection.prepareStatementWithExceptionList(entity, preparedStatement, databaseTable, List.of(databaseTable.getPrimaryKey())), entity, preparedStatement, databaseTable, List.of(databaseTable.getPrimaryKey()));
+                tableReflection.prepareStatementWithExcludedList(tableReflection.prepareStatementWithExceptionList(realObject, preparedStatement, databaseTable, List.of(databaseTable.getPrimaryKey())), realObject, preparedStatement, databaseTable, List.of(databaseTable.getPrimaryKey()));
                 preparedStatement.executeUpdate();
             } else {
                 String insertQuery = queryBuilder.getInsertQuery(databaseTable);
                 try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
-                    tableReflection.prepareStatementWithExceptionList(entity, preparedStatement, databaseTable, List.of(databaseTable.getPrimaryKey()));
+                    tableReflection.prepareStatementWithExceptionList(realObject, preparedStatement, databaseTable, List.of(databaseTable.getPrimaryKey()));
                     preparedStatement.execute();
                     ResultSet resultSet = preparedStatement.getGeneratedKeys();
                     if (resultSet.next()) {
-                        tableReflection.setField(entity, resultSet.getObject(1), databaseTable.getPrimaryKey());
+                        tableReflection.setField(realObject, resultSet.getObject(1), databaseTable.getPrimaryKey());
                     }
                 }
             }
@@ -195,7 +195,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         String deleteQuery = queryBuilder.getDeleteQuery(databaseTable);
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery)) {
-            tableReflection.prepareStatementWithExcludedList(entity, preparedStatement, databaseTable, List.of(databaseTable.getPrimaryKey()));
+            tableReflection.prepareStatementWithExcludedList(realObject, preparedStatement, databaseTable, List.of(databaseTable.getPrimaryKey()));
             preparedStatement.execute();
         } catch (SQLException e) {
             throw new PersistenceException("Error deleting entity", e);
