@@ -111,8 +111,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         if (Proxy.isProxyClass(entity.getClass())) {
             InvocationHandler handler = Proxy.getInvocationHandler(entity);
 
-            if (handler instanceof LazyProxyHandler<?>) {
-                LazyProxyHandler lazyHandler = (LazyProxyHandler) handler;
+            if (handler instanceof LazyProxyHandler lazyHandler) {
                 if (!lazyHandler.isInitialized()) {
                     return;
                 }
@@ -169,28 +168,17 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         }
         DatabaseTable databaseTable = null;
         Object realObject = null;
+        Object PK = null;
         if (Proxy.isProxyClass(entity.getClass())) {
             InvocationHandler handler = Proxy.getInvocationHandler(entity);
 
-            if (handler instanceof LazyProxyHandler<?>) {
-                LazyProxyHandler lazyHandler = (LazyProxyHandler) handler;
-                if (!lazyHandler.isInitialized()) {
-                    return;
-                }
-                databaseTable = getDatabaseTable(lazyHandler.getTargetClass());
-                realObject = lazyHandler.getRealObject();
+            if (handler instanceof LazyProxyHandler lazyHandler) {
+                PK = lazyHandler.getID();
             }
         }
-        if(databaseTable == null) {
-            databaseTable = getDatabaseTable(entity.getClass());
-            realObject = entity;
+        if(PK == null) {
+            PK = tableReflection.getFieldValue(realObject, databaseTable, databaseTable.getPrimaryKey());
         }
-
-        if(databaseTable == null) {
-            return;
-        }
-
-        Object PK = tableReflection.getFieldValue(realObject, databaseTable, databaseTable.getPrimaryKey());
 
         if (!PKExist(databaseTable, PK)) {
             throw new PersistenceException("Object not found in database");

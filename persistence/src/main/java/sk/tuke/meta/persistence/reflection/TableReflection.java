@@ -229,7 +229,8 @@ public class TableReflection {
                             value = LazyProxyHandler.createProxy(
                                     field.getType(),
                                     columnAnnotation.targetClass(),
-                                    () -> persistenceManager.get(columnAnnotation.targetClass(), foreignKeyId).orElse(null)
+                                    foreignKeyId,
+                                    () -> persistenceManager.get(columnAnnotation.targetClass(), foreignKeyId)
                             );
                         } else {
                             // Bežné načítanie cudzieho kľúča

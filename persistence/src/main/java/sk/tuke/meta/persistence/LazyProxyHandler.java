@@ -9,10 +9,16 @@ public class LazyProxyHandler<T> implements InvocationHandler {
     private final Class<T> targetClass;
     private final Supplier<T> loader;
     private T realObject;
+    private final Long ID;
 
-    public LazyProxyHandler(Class<T> targetClass, Supplier<T> loader) {
+    public LazyProxyHandler(Class<T> targetClass, Long ID, Supplier<T> loader) {
         this.targetClass = targetClass;
         this.loader = loader;
+        this.ID = ID;
+    }
+
+    public Object getID(){
+        return ID;
     }
 
     public boolean isInitialized() {
@@ -38,12 +44,12 @@ public class LazyProxyHandler<T> implements InvocationHandler {
         return method.invoke(realObject, args);
     }
 
-    public static <T> T createProxy(Class<T> interfaceType, Class<?> targetClass, Supplier<?> loader) {
+    public static <T> T createProxy(Class<T> interfaceType, Class<?> targetClass, Long ID, Supplier<?> loader) {
         return interfaceType.cast(
                 Proxy.newProxyInstance(
                         interfaceType.getClassLoader(),
                         new Class<?>[]{interfaceType},
-                        new LazyProxyHandler<>((Class<T>) targetClass, (Supplier<T>) loader)
+                        new LazyProxyHandler<>((Class<T>) targetClass, ID, (Supplier<T>) loader)
                 )
         );
     }
