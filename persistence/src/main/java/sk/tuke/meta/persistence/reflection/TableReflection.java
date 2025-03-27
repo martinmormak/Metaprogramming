@@ -255,6 +255,9 @@ public class TableReflection {
                 System.out.println("Field accessible assigning values");
                 values.add(new Entity(column.getSQLAlias(), field.get(entity)));
             } catch (NoSuchFieldException | IllegalAccessException e) {
+                for (Field field1 : entity.getClass().getDeclaredFields()) {
+                    System.out.println(field1.getName());
+                }
                 throw new PersistenceException("No such field: " + column.name(),e);
             }
         }
