@@ -164,19 +164,29 @@ public class ReflectivePersistenceManager implements PersistenceManager {
             System.out.println(e.getMessage());
         }
         DatabaseTable databaseTable = null;
-        Object PK = null;
+        Object realObject = null;
         if (Proxy.isProxyClass(entity.getClass())) {
             InvocationHandler handler = Proxy.getInvocationHandler(entity);
 
-            if (handler instanceof LazyProxyHandler lazyHandler) {
-                PK = lazyHandler.getID();
-                databaseTable = tableReflection.createDatabaseTable(lazyHandler.getTargetClass());
+            if (handler instanceof LazyProxyHandler<?>) {
+                LazyProxyHandler lazyHandler = (LazyProxyHandler) handler;
+                if (!lazyHandler.isInitialized()) {
+                    return;
+                }
+                databaseTable = getDatabaseTable(lazyHandler.getTargetClass());
+                realObject = lazyHandler.getRealObject();
             }
         }
         if(databaseTable == null) {
-            databaseTable = tableReflection.createDatabaseTable(entity.getClass());
-            PK = tableReflection.getFieldValue(entity, databaseTable, databaseTable.getPrimaryKey());
+            databaseTable = getDatabaseTable(entity.getClass());
+            realObject = entity;
         }
+
+        if(databaseTable == null) {
+            return;
+        }
+
+        Object PK = tableReflection.getFieldValue(realObject, databaseTable, databaseTable.getPrimaryKey());
 
         if (!PKExist(databaseTable, PK)) {
             throw new PersistenceException("Object not found in database");
@@ -185,7 +195,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         String deleteQuery = queryBuilder.getDeleteQuery(databaseTable);
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery)) {
-            preparedStatement.setObject(1, PK);
+            tableReflection.prepareStatementWithExcludedList(realObject, preparedStatement, databaseTable, List.of(databaseTable.getPrimaryKey()));
             preparedStatement.execute();
         } catch (SQLException e) {
             throw new PersistenceException("Error deleting entity", e);
