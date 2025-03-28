@@ -258,19 +258,10 @@ public class TableReflection {
         for (DatabaseColumn column : databaseTable.getDatabaseColumnList()) {
             Field field;
             try {
-                System.out.println("Looking for field");
                 field = entity.getClass().getDeclaredField(column.name());
-                System.out.println("Field found setting accessible");
                 field.setAccessible(true);
-                System.out.println("Field accessible assigning values");
                 values.add(new Entity(column.getSQLAlias(), field.get(entity)));
             } catch (NoSuchFieldException | IllegalAccessException e) {
-                for (Field field1 : entity.getClass().getDeclaredFields()) {
-                    System.out.println("Found field" + field1.getName());
-                    for(Annotation annotation : field1.getAnnotations()) {
-                        System.out.println("Field annotation"+annotation);
-                    }
-                }
                 throw new PersistenceException("No such field: " + column.name(),e);
             }
         }
