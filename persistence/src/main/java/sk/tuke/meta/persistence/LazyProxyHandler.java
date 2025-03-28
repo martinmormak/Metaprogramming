@@ -28,6 +28,10 @@ public class LazyProxyHandler<T> implements InvocationHandler {
         return realObject;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public Class<T> getTargetClass() {
         return targetClass;
     }
