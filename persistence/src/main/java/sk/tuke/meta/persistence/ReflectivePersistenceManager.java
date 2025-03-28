@@ -182,6 +182,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
                     System.out.println("proxy is unitialized");
                     return;
                 }
+                System.out.println("proxy is itialized");
                 databaseTable = getDatabaseTable(lazyHandler.getTargetClass());
                 PK = lazyHandler.getId();
             }
