@@ -116,7 +116,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
                     return;
                 }
                 databaseTable = getDatabaseTable(lazyHandler.getTargetClass());
-                realObject = tableReflection.getFieldValue(realObject, databaseTable, databaseTable.getPrimaryKey());
+                realObject = lazyHandler.getRealObject();
             }
         }
         if(databaseTable == null) {
