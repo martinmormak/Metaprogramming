@@ -109,12 +109,16 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         DatabaseTable databaseTable = null;
         Object realObject = null;
         if (Proxy.isProxyClass(entity.getClass())) {
+            System.out.println("entity was proxy");
             InvocationHandler handler = Proxy.getInvocationHandler(entity);
 
             if (handler instanceof LazyProxyHandler lazyHandler) {
+                System.out.println("proxy is LazyProxyHandler");
                 if (!lazyHandler.isInitialized()) {
+                    System.out.println("proxy is unitialized");
                     return;
                 }
+                System.out.println("proxy is itialized");
                 databaseTable = getDatabaseTable(lazyHandler.getTargetClass());
                 realObject = lazyHandler.getRealObject();
             }
@@ -169,10 +173,13 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         DatabaseTable databaseTable = null;
         Object PK = null;
         if (Proxy.isProxyClass(entity.getClass())) {
+            System.out.println("entity was proxy");
             InvocationHandler handler = Proxy.getInvocationHandler(entity);
 
             if (handler instanceof LazyProxyHandler lazyHandler) {
+                System.out.println("proxy is LazyProxyHandler");
                 if (!lazyHandler.isInitialized()) {
+                    System.out.println("proxy is unitialized");
                     return;
                 }
                 databaseTable = getDatabaseTable(lazyHandler.getTargetClass());
