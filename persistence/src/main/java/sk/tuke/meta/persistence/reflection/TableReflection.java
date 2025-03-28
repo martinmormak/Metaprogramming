@@ -21,8 +21,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-import static sk.tuke.meta.persistence.ReflectivePersistenceManager.getEntityDetails;
-
 public class TableReflection {
     PersistenceManager persistenceManager;
 
@@ -134,11 +132,6 @@ public class TableReflection {
     }
 
     public <T> Object getFieldValue(T entity, DatabaseTable databaseTable, String fieldName) {
-        try {
-            System.out.println("My debug output getFieldValue:" + getEntityDetails(entity));
-        } catch (Exception e){
-            System.out.println(e.getMessage());
-        }
         return getColumnValues(entity,databaseTable).stream()
                 .filter(columnEntity -> columnEntity.name().equals(fieldName))
                 .map(Entity::value)
@@ -249,11 +242,6 @@ public class TableReflection {
     }
 
     public LinkedList<Entity> getColumnValues(Object entity, DatabaseTable databaseTable) {
-        try {
-            System.out.println("My debug output getColumnValues:" + getEntityDetails(entity));
-        } catch (Exception e){
-            System.out.println(e.getMessage());
-        }
         LinkedList<Entity> values = new LinkedList<>();
         for (DatabaseColumn column : databaseTable.getDatabaseColumnList()) {
             Field field;

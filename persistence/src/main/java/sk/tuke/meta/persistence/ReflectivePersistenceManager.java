@@ -101,11 +101,6 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
     @Override
     public <T> void save(T entity) {
-        try {
-            System.out.println("My debug output save:" + getEntityDetails(entity));
-        } catch (Exception e){
-            System.out.println(e.getMessage());
-        }
         DatabaseTable databaseTable = null;
         Object realObject = null;
         if (Proxy.isProxyClass(entity.getClass())) {
@@ -165,11 +160,6 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
     @Override
     public void delete(Object entity) {
-        try {
-            System.out.println("My debug output delete:" + getEntityDetails(entity));
-        } catch (Exception e){
-            System.out.println(e.getMessage());
-        }
         DatabaseTable databaseTable = null;
         Object PK = null;
         if (Proxy.isProxyClass(entity.getClass())) {
@@ -178,11 +168,6 @@ public class ReflectivePersistenceManager implements PersistenceManager {
 
             if (handler instanceof LazyProxyHandler lazyHandler) {
                 System.out.println("proxy is LazyProxyHandler");
-                if (!lazyHandler.isInitialized()) {
-                    System.out.println("proxy is unitialized");
-                    return;
-                }
-                System.out.println("proxy is itialized");
                 databaseTable = getDatabaseTable(lazyHandler.getTargetClass());
                 PK = lazyHandler.getId();
             }
@@ -285,7 +270,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         }
     }
 
-    public static String getEntityDetails(Object entity) {
+    /*public static String getEntityDetails(Object entity) {
         StringBuilder sb = new StringBuilder(entity.getClass().getSimpleName() + " { ");
         sb.append("My debug output getEntityDetails:").append(entity);
         for (Field field : entity.getClass().getDeclaredFields()) {
@@ -298,6 +283,6 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         }
         sb.append("}");
         return sb.toString();
-    }
+    }*/
 
 }
