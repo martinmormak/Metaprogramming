@@ -7,12 +7,14 @@ import java.util.function.Supplier;
 
 public class LazyProxyHandler<T> implements InvocationHandler {
     private final Class<T> targetClass;
-    private final Supplier<T> loader;
+    Long id;
+    PersistenceManager persistenceManager;
     private T realObject;
 
-    public LazyProxyHandler(Class<T> targetClass, Supplier<T> loader) {
+    public LazyProxyHandler(Class<T> targetClass, Long id, PersistenceManager persistenceManager) {
         this.targetClass = targetClass;
-        this.loader = loader;
+        this.id = id;
+        this.persistenceManager = persistenceManager;
     }
 
     public boolean isInitialized() {
@@ -21,7 +23,7 @@ public class LazyProxyHandler<T> implements InvocationHandler {
 
     public T getRealObject() {
         if(realObject == null) {
-            realObject = loader.get();
+            realObject = persistenceManager.get(targetClass, id).orElse(null);
         }
         return realObject;
     }
@@ -33,17 +35,17 @@ public class LazyProxyHandler<T> implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (realObject == null) {
-            realObject = loader.get(); // Načítanie skutočného objektu
+            realObject = persistenceManager.get(targetClass, id).orElse(null); // Načítanie skutočného objektu
         }
         return method.invoke(realObject, args);
     }
 
-    public static <T> T createProxy(Class<T> interfaceType, Class<?> targetClass, Supplier<?> loader) {
+    public static <T> T createProxy(Class<T> interfaceType, Class<?> targetClass, Long id, PersistenceManager persistenceManager) {
         return interfaceType.cast(
                 Proxy.newProxyInstance(
                         interfaceType.getClassLoader(),
                         new Class<?>[]{interfaceType},
-                        new LazyProxyHandler<>((Class<T>) targetClass, (Supplier<T>) loader)
+                        new LazyProxyHandler<>((Class<T>) targetClass, id, persistenceManager)
                 )
         );
     }
