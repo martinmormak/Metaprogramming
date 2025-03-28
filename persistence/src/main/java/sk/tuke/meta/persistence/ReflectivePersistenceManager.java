@@ -111,8 +111,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         if (Proxy.isProxyClass(entity.getClass())) {
             InvocationHandler handler = Proxy.getInvocationHandler(entity);
 
-            if (handler instanceof LazyProxyHandler<?>) {
-                LazyProxyHandler lazyHandler = (LazyProxyHandler) handler;
+            if (handler instanceof LazyProxyHandler lazyHandler) {
                 if (!lazyHandler.isInitialized()) {
                     return;
                 }
@@ -172,8 +171,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         if (Proxy.isProxyClass(entity.getClass())) {
             InvocationHandler handler = Proxy.getInvocationHandler(entity);
 
-            if (handler instanceof LazyProxyHandler<?>) {
-                LazyProxyHandler lazyHandler = (LazyProxyHandler) handler;
+            if (handler instanceof LazyProxyHandler lazyHandler) {
                 if (!lazyHandler.isInitialized()) {
                     return;
                 }
