@@ -3,6 +3,7 @@ package sk.tuke.meta.persistence.database.query;
 import sk.tuke.meta.persistence.PersistenceException;
 import sk.tuke.meta.persistence.database.DatabaseColumn;
 import sk.tuke.meta.persistence.database.DatabaseTable;
+import sk.tuke.meta.persistence.entity.FKNameEntity;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +32,7 @@ public class QueryBuilder {
 
     public String getCreateTableQuery(DatabaseTable databaseTable) {
         StringBuilder query = new StringBuilder("CREATE TABLE IF NOT EXISTS \"" + databaseTable.getSQLAlias() + "\" (\n\"");
-        List<String> foreignKeys = new ArrayList<>();
+        List<FKNameEntity> foreignKeys = databaseTable.getForeignKeyList();
         boolean hasPrimaryKey = false;
 
         for (DatabaseColumn databaseColumn : databaseTable.getDatabaseColumnList()) {
@@ -49,7 +50,6 @@ public class QueryBuilder {
                 query.append("TEXT");
             } else {
                 query.append("INTEGER");
-                foreignKeys.add(databaseColumn.getSQLAlias());
             }
             if(databaseColumn.isPrimaryKey()) {
                 if(hasPrimaryKey) {
@@ -74,8 +74,8 @@ public class QueryBuilder {
             throw new PersistenceException("Primary keys doesn't exists");
         }
 
-        for (String foreignKey : foreignKeys) {
-            query.append("FOREIGN KEY (\"").append(foreignKey).append("\") REFERENCES \"").append(foreignKey).append("\" ( ID ) ON DELETE SET NULL");
+        for (FKNameEntity foreignKey : foreignKeys) {
+            query.append("FOREIGN KEY (\"").append(foreignKey.getSQLAlias()).append("\") REFERENCES \"").append(foreignKey.getTargetClass().getSimpleName()).append("\" ( ID ) ON DELETE SET NULL");
             query.append(",\n");
         }
         query.deleteCharAt(query.length() - 1);

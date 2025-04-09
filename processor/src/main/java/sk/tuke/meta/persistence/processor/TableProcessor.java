@@ -3,7 +3,10 @@ package sk.tuke.meta.persistence.processor;
 import sk.tuke.meta.persistence.annotations.Column;
 import sk.tuke.meta.persistence.annotations.Id;
 import sk.tuke.meta.persistence.annotations.Table;
+import sk.tuke.meta.persistence.database.DatabaseColumn;
 import sk.tuke.meta.persistence.database.DatabaseTable;
+import sk.tuke.meta.persistence.database.query.QueryBuilder;
+import sk.tuke.meta.persistence.entity.FKNameEntity;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -29,6 +32,7 @@ public class TableProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         try {
             List<DatabaseTable> databaseTables = new ArrayList<>();
+            List<FKNameEntity> foreignKeyList = new ArrayList<>();
             if (annotations.isEmpty()) {
                 return false;
             }
@@ -43,37 +47,36 @@ public class TableProcessor extends AbstractProcessor {
                     Table table = classElement.getAnnotation(Table.class);
                     String tableName = table.name().isEmpty() ? classElement.getSimpleName().toString() : table.name();
 
-                    List<String> columns = new ArrayList<>();
-                    List<String> foreignKeys = new ArrayList<>();
-                    String primaryKey = null;
 
-                    SQLQueryBuilder.append("CREATE TABLE IF NOT EXISTS \"").append(tableName).append("\" (\n");
+                    List<DatabaseColumn> databaseColumns = new ArrayList<>();
 
                     for (VariableElement variableElement : ElementFilter.fieldsIn(classElement.getEnclosedElements())) {
+                        boolean isFK = false;
                         Column column = variableElement.getAnnotation(Column.class);
                         Id id = variableElement.getAnnotation(Id.class);
+                        String referencedTableName = "";
 
-                        if (column == null && id == null) continue;
+                        if (column == null) continue;
 
                         String columnName = (column != null && !column.name().isEmpty()) ? column.name() : variableElement.getSimpleName().toString();
-                        String columnType;
+                        Class<?> columnType;
 
                         switch (variableElement.asType().toString()) {
                             case "long", "java.lang.Long":
-                                columnType = "INTEGER";
+                                columnType = long.class;
                                 break;
                             case "int", "java.lang.Integer":
-                                columnType = "INTEGER";
+                                columnType = Integer.class;
                                 break;
                             case "float", "java.lang.Float", "double", "java.lang.Double":
-                                columnType = "REAL";
+                                columnType = float.class;
                                 break;
                             case "java.lang.String":
-                                columnType = "TEXT";
+                                columnType = String.class;
                                 break;
                             default:
-                                columnType = "INTEGER";
-                                if(column==null) continue;
+                                columnType = Integer.class;
+                                isFK = true;
                                 TypeMirror targetTypeMirror = getTargetTypeMirror(column);
                                 if (targetTypeMirror != null) {
                                     Element targetElement = processingEnv.getTypeUtils().asElement(targetTypeMirror);
@@ -82,37 +85,33 @@ public class TableProcessor extends AbstractProcessor {
                                         if (referencedTable == null) {
                                             throw new ProcessorException("Referenced class " + targetClassElement.getSimpleName() + " is not annotated with @Table");
                                         }
-                                        String referencedTableName = referencedTable.name().isEmpty()
+                                        referencedTableName = referencedTable.name().isEmpty()
                                                 ? targetClassElement.getSimpleName().toString()
                                                 : referencedTable.name();
-
-                                        foreignKeys.add("FOREIGN KEY (\"" + columnName + "\") REFERENCES \"" + referencedTableName + "\" (ID) ON DELETE SET NULL");
                                     }
                                 }
                                 break;
                         }
 
-                        if (id != null) {
-                            primaryKey = columnName;
-                            columnType += " PRIMARY KEY AUTOINCREMENT";
-                        } else {
-                            if (!column.nullable()) columnType += " NOT NULL";
-                            if (column.unique()) columnType += " UNIQUE";
+                        DatabaseColumn databaseColumn = new DatabaseColumn(columnType, columnName, column, referencedTableName, id!=null);
+                        databaseColumns.add(databaseColumn);
+                        if(isFK){
+                            foreignKeyList.add(databaseColumn.getForeignKey());
                         }
-
-                        columns.add("\"" + columnName + "\" " + columnType);
                     }
 
-                    if (primaryKey == null) {
+
+
+                    /*if (primaryKey == null) {
                         throw new ProcessorException("Table " + tableName + " dont have primary key.");
-                    }
+                    }*/
 
-                    SQLQueryBuilder.append(String.join(",\n", columns));
+                    /*SQLQueryBuilder.append(String.join(",\n", columns));
                     if (!foreignKeys.isEmpty()) {
                         SQLQueryBuilder.append(",\n");
                         SQLQueryBuilder.append(String.join(",\n", foreignKeys));
-                    }
-                    SQLQueryBuilder.append("\n);\n\n");
+                    }*/
+                    SQLQueryBuilder.append(new QueryBuilder().getCreateTableQuery(new DatabaseTable(tableName, table, databaseColumns, foreignKeyList, false))).append("\n\n");
                 }
             }
 

@@ -258,10 +258,10 @@ public class TableReflection {
 
     private boolean checkIfItIsFKObject(DatabaseTable databaseTable, Entity columnEntity) {
         for(FKNameEntity fkNameEntity : databaseTable.getForeignKeyList()) {
-            if(fkNameEntity.SQLAlias().contains(columnEntity.name())){
+            if(fkNameEntity.getSQLAlias().contains(columnEntity.name())){
                 return true;
             }
-            if(fkNameEntity.javaName().contains(columnEntity.name())){
+            if(fkNameEntity.getJavaName().contains(columnEntity.name())){
                 return true;
             }
         }
@@ -270,10 +270,10 @@ public class TableReflection {
 
     private boolean checkIfItIsFKObject(DatabaseTable databaseTable, String columnName) {
         for(FKNameEntity fkNameEntity : databaseTable.getForeignKeyList()) {
-            if(fkNameEntity.SQLAlias().contains(columnName)){
+            if(fkNameEntity.getSQLAlias().contains(columnName)){
                 return true;
             }
-            if(fkNameEntity.javaName().contains(columnName)){
+            if(fkNameEntity.getJavaName().contains(columnName)){
                 return true;
             }
         }

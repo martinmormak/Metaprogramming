@@ -13,12 +13,24 @@ public class DatabaseTable {
     private List<FKNameEntity> foreignKeyList;
     private boolean created;
 
+    public DatabaseTable(String name, String SQLAlias, List<DatabaseColumn> databaseColumnList, List<FKNameEntity> foreignKeyList, boolean created) {
+        this.name = name;
+        this.SQLAlias = SQLAlias;
+        this.databaseColumnList = databaseColumnList;
+        this.created = created;
+        this.foreignKeyList = foreignKeyList;
+    }
+
     public DatabaseTable(String name, String SQLAlias, List<DatabaseColumn> databaseColumnList, boolean created) {
         this.name = name;
         this.SQLAlias = SQLAlias;
         this.databaseColumnList = databaseColumnList;
         this.created = created;
         getForeignKeyList(databaseColumnList);
+    }
+
+    public DatabaseTable(String name, Table tableAnnotation, List<DatabaseColumn> databaseColumnList, List<FKNameEntity> foreignKeyList, boolean created) {
+        this(name, tableAnnotation.name(), databaseColumnList, foreignKeyList, created);
     }
 
     public DatabaseTable(String name, Table tableAnnotation, List<DatabaseColumn> databaseColumnList, boolean created) {

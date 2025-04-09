@@ -233,7 +233,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
     private <T> boolean checkForeignKeysExists(T entity, DatabaseTable databaseTable) {
         for (FKNameEntity fieldName : databaseTable.getForeignKeyList()) {
             try {
-                Field field = entity.getClass().getDeclaredField(fieldName.javaName());
+                Field field = entity.getClass().getDeclaredField(fieldName.getJavaName());
                 field.setAccessible(true);
                 Object value = field.get(entity);
 

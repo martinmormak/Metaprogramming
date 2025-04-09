@@ -1,6 +1,13 @@
 package sk.tuke.meta.persistence.database;
 
 import sk.tuke.meta.persistence.annotations.Column;
+import sk.tuke.meta.persistence.annotations.Table;
+import sk.tuke.meta.persistence.entity.FKNameEntity;
+
+import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.MirroredTypeException;
+import javax.lang.model.type.TypeMirror;
 
 public class DatabaseColumn {
     private final Class<?> type;
@@ -10,6 +17,7 @@ public class DatabaseColumn {
     private final boolean unique;
     private final boolean lazyFetch;
     private final Class<?> targetClass;
+    private String referencedTableName = "";
     private final boolean isPrimaryKey;
     public DatabaseColumn(Class<?> type, String name, String columnName, boolean nullable, boolean unique,
                           boolean lazyFetch, Class<?> targetClass, boolean isPrimaryKey) {
@@ -38,7 +46,12 @@ public class DatabaseColumn {
     }
 
     public DatabaseColumn(Class<?> type, String name, Column columnAnnotation, boolean isPrimaryKey) {
-        this(type, name, columnAnnotation.name(), columnAnnotation.nullable(), columnAnnotation.unique(), columnAnnotation.lazyFetch(), columnAnnotation.targetClass(), isPrimaryKey);
+        this(type, name, columnAnnotation.name(), columnAnnotation.nullable(), columnAnnotation.unique(), columnAnnotation.lazyFetch(), getTargetClass(columnAnnotation), isPrimaryKey);
+    }
+
+    public DatabaseColumn(Class<?> type, String name, Column columnAnnotation, String referencedTableName, boolean isPrimaryKey) {
+        this(type, name, columnAnnotation.name(), columnAnnotation.nullable(), columnAnnotation.unique(), columnAnnotation.lazyFetch(), getTargetClass(columnAnnotation), isPrimaryKey);
+        this.referencedTableName = referencedTableName;
     }
 
     public Class<?> getType() {
@@ -75,5 +88,27 @@ public class DatabaseColumn {
 
     public String getSQLAlias(){
         return columnName==null || columnName.isEmpty() ?name:columnName;
+    }
+
+    public FKNameEntity getForeignKey() {
+        return new FKNameEntity(name, columnName, targetClass, referencedTableName);
+    }
+
+    private static Class<?> getTargetClass (Column columnAnnotation){
+        TypeMirror typeMirror = null;
+        try {
+            columnAnnotation.targetClass(); // This triggers MirroredTypeException
+        } catch (MirroredTypeException e) {
+            typeMirror = e.getTypeMirror(); // Correct way to get the TypeMirror
+        }
+        Class<?> targetClass = void.class;
+        if (typeMirror != null && !typeMirror.toString().equals("void")) {
+            try {
+                targetClass = Class.forName(typeMirror.toString());
+            } catch (ClassNotFoundException e) {
+                targetClass = Object.class; // best effort
+            }
+        }
+        return targetClass;
     }
 }
