@@ -3,6 +3,7 @@ package sk.tuke.meta.persistence.processor;
 import sk.tuke.meta.persistence.annotations.Column;
 import sk.tuke.meta.persistence.annotations.Id;
 import sk.tuke.meta.persistence.annotations.Table;
+import sk.tuke.meta.persistence.database.DatabaseTable;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -27,6 +28,7 @@ public class TableProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         try {
+            List<DatabaseTable> databaseTables = new ArrayList<>();
             if (annotations.isEmpty()) {
                 return false;
             }

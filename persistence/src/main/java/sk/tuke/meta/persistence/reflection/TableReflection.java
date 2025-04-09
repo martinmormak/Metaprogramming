@@ -38,9 +38,9 @@ public class TableReflection {
                         throw new PersistenceException("More ten one primary key in table " + type.getName());
                     }
                     isPrimaryKeyPresent = true;
-                    databaseColumnsList.add(new DatabaseColumn(field.getType(), field.getAnnotation(Column.class), field.getName(), true));
+                    databaseColumnsList.add(new DatabaseColumn(field.getType(), field.getName(), field.getAnnotation(Column.class), true));
                 } else {
-                    databaseColumnsList.add(new DatabaseColumn(field.getType(), field.getAnnotation(Column.class), field.getName(), false));
+                    databaseColumnsList.add(new DatabaseColumn(field.getType(), field.getName(), field.getAnnotation(Column.class), false));
                 }
             }else {
                 System.out.println("Column " + type.getSimpleName() + " in table " + type.getName() + " is not annotated with @Column");
@@ -67,7 +67,7 @@ public class TableReflection {
 
     public DatabaseTable createDatabaseTable(Class<?> type) {
         if(type.isAnnotationPresent(Table.class)){
-            return new DatabaseTable(type.getAnnotation(Table.class), type.getSimpleName(), createDatabaseColumns(type), false);
+            return new DatabaseTable(type.getSimpleName(), type.getAnnotation(Table.class), createDatabaseColumns(type), false);
         }
         throw new PersistenceException("Table " + type.getSimpleName() + " is not annotated with @Table");
     }
@@ -198,7 +198,7 @@ public class TableReflection {
             List<DatabaseColumn> databaseColumns = databaseTable.getDatabaseColumnList();
 
             for (DatabaseColumn databaseColumn : databaseColumns) {
-                Field field = type.getDeclaredField(databaseColumn.name());
+                Field field = type.getDeclaredField(databaseColumn.getName());
                 field.setAccessible(true);
                 Object value;
 
@@ -246,11 +246,11 @@ public class TableReflection {
         for (DatabaseColumn column : databaseTable.getDatabaseColumnList()) {
             Field field;
             try {
-                field = entity.getClass().getDeclaredField(column.name());
+                field = entity.getClass().getDeclaredField(column.getName());
                 field.setAccessible(true);
                 values.add(new Entity(column.getSQLAlias(), field.get(entity)));
             } catch (NoSuchFieldException | IllegalAccessException e) {
-                throw new PersistenceException("No such field: " + column.name(),e);
+                throw new PersistenceException("No such field: " + column.getName(),e);
             }
         }
         return values;

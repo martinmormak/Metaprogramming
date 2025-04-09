@@ -38,14 +38,14 @@ public class QueryBuilder {
 
             query.append(databaseColumn.getSQLAlias()).append("\" ");
 
-            if (databaseColumn.type().equals(long.class)) {
+            if (databaseColumn.getType().equals(long.class)) {
                 query.append("INTEGER");
-            } else if (databaseColumn.type().equals(int.class) || databaseColumn.type().equals(Integer.class)) {
+            } else if (databaseColumn.getType().equals(int.class) || databaseColumn.getType().equals(Integer.class)) {
                 query.append("INTEGER");
-            } else if (databaseColumn.type().equals(float.class) || databaseColumn.type().equals(Float.class) ||
-                    databaseColumn.type().equals(double.class) || databaseColumn.type().equals(Double.class)) {
+            } else if (databaseColumn.getType().equals(float.class) || databaseColumn.getType().equals(Float.class) ||
+                    databaseColumn.getType().equals(double.class) || databaseColumn.getType().equals(Double.class)) {
                 query.append("REAL");
-            } else if (databaseColumn.type().equals(String.class)) {
+            } else if (databaseColumn.getType().equals(String.class)) {
                 query.append("TEXT");
             } else {
                 query.append("INTEGER");
@@ -58,10 +58,10 @@ public class QueryBuilder {
                 hasPrimaryKey = true;
                 query.append(" PRIMARY KEY AUTOINCREMENT");
             } else {
-                if(databaseColumn.annotation().nullable()){
+                if(databaseColumn.isNullable()){
                     query.append(" NOT NULL");
                 }
-                if(databaseColumn.annotation().unique()){
+                if(databaseColumn.isUnique()){
                     query.append(" UNIQUE");
 
                 }

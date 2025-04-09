@@ -7,22 +7,26 @@ import sk.tuke.meta.persistence.entity.FKNameEntity;
 import java.util.*;
 
 public class DatabaseTable {
-    private final Table annotation;
     private final String name;
+    private final String SQLAlias;
     private final List<DatabaseColumn> databaseColumnList;
     private List<FKNameEntity> foreignKeyList;
     private boolean created;
 
-    public DatabaseTable(Table annotation, String name, List<DatabaseColumn> databaseColumnList, boolean created) {
-        this.annotation = annotation;
+    public DatabaseTable(String name, String SQLAlias, List<DatabaseColumn> databaseColumnList, boolean created) {
         this.name = name;
+        this.SQLAlias = SQLAlias;
         this.databaseColumnList = databaseColumnList;
         this.created = created;
         getForeignKeyList(databaseColumnList);
     }
 
+    public DatabaseTable(String name, Table tableAnnotation, List<DatabaseColumn> databaseColumnList, boolean created) {
+        this(name, tableAnnotation.name(), databaseColumnList, created);
+    }
+
     public String getSQLAlias() {
-        return annotation==null || annotation.name()==null || annotation.name().isEmpty()?name:annotation.name();
+        return SQLAlias==null || SQLAlias.isEmpty()?name:SQLAlias;
     }
 
     public List<DatabaseColumn> getDatabaseColumnList() {
@@ -48,13 +52,13 @@ public class DatabaseTable {
     private void getForeignKeyList(List<DatabaseColumn> databaseColumnsList) {
         foreignKeyList = new ArrayList<>();
         for (DatabaseColumn databaseColumn : databaseColumnsList) {
-            Class<?> columnType = databaseColumn.type();
+            Class<?> columnType = databaseColumn.getType();
             if (!columnType.isPrimitive() && !columnType.equals(Integer.class) && !columnType.equals(Float.class)
                     && !columnType.equals(Double.class) && !columnType.equals(String.class)) {
-                if(databaseColumn.annotation().targetClass()!=null) {
-                    foreignKeyList.add(new FKNameEntity(databaseColumn.name(), databaseColumn.getSQLAlias(), databaseColumn.annotation().targetClass()));
+                if(databaseColumn.getTargetClass()!=null) {
+                    foreignKeyList.add(new FKNameEntity(databaseColumn.getName(), databaseColumn.getSQLAlias(), databaseColumn.getTargetClass()));
                 } else {
-                    foreignKeyList.add(new FKNameEntity(databaseColumn.name(), databaseColumn.getSQLAlias(), databaseColumn.getClass()));
+                    foreignKeyList.add(new FKNameEntity(databaseColumn.getName(), databaseColumn.getSQLAlias(), databaseColumn.getClass()));
                 }
             }
         }
