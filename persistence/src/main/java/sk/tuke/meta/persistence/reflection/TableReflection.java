@@ -11,7 +11,6 @@ import sk.tuke.meta.persistence.entity.Entity;
 import sk.tuke.meta.persistence.entity.FKNameEntity;
 import sk.tuke.meta.persistence.LazyProxyHandler;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -35,7 +34,7 @@ public class TableReflection {
             if (field.isAnnotationPresent(Column.class)) {
                 if(field.isAnnotationPresent(Id.class)){
                     if(isPrimaryKeyPresent){
-                        throw new PersistenceException("More ten one primary key in table " + type.getName());
+                        throw new PersistenceException("createDatabaseColumns: More ten one primary key in table " + type.getName());
                     }
                     isPrimaryKeyPresent = true;
                     databaseColumnsList.add(new DatabaseColumn(field.getType(), field.getName(), field.getAnnotation(Column.class), true));
@@ -67,7 +66,7 @@ public class TableReflection {
 
     public DatabaseTable createDatabaseTable(Class<?> type) {
         if(type.isAnnotationPresent(Table.class)){
-            return new DatabaseTable(type.getSimpleName(), type.getAnnotation(Table.class), createDatabaseColumns(type), false);
+            return new DatabaseTable(type.getSimpleName(), type.getPackageName(), type.getAnnotation(Table.class), createDatabaseColumns(type), false);
         }
         throw new PersistenceException("Table " + type.getSimpleName() + " is not annotated with @Table");
     }
@@ -123,7 +122,7 @@ public class TableReflection {
 
     public <T> int prepareStatementWithExcludedList(int index, T entity, PreparedStatement preparedStatement, DatabaseTable databaseTable, List<String> excludedList) {
         List<String> exceptionList = new ArrayList<>();
-        for (DatabaseColumn databaseColumn : databaseTable.getDatabaseColumnList()) {
+        for (DatabaseColumn databaseColumn : databaseTable.getDatabaseColumnsList()) {
             if (!excludedList.contains(databaseColumn.getSQLAlias())) {
                 exceptionList.add(databaseColumn.getSQLAlias());
             }
@@ -195,7 +194,7 @@ public class TableReflection {
     public <T> T getInstanceFromDatabase(Class<T> type, ResultSet resultSet, DatabaseTable databaseTable) {
         try {
             T instance = type.getDeclaredConstructor().newInstance();
-            List<DatabaseColumn> databaseColumns = databaseTable.getDatabaseColumnList();
+            List<DatabaseColumn> databaseColumns = databaseTable.getDatabaseColumnsList();
 
             for (DatabaseColumn databaseColumn : databaseColumns) {
                 Field field = type.getDeclaredField(databaseColumn.getName());
@@ -243,7 +242,7 @@ public class TableReflection {
 
     public LinkedList<Entity> getColumnValues(Object entity, DatabaseTable databaseTable) {
         LinkedList<Entity> values = new LinkedList<>();
-        for (DatabaseColumn column : databaseTable.getDatabaseColumnList()) {
+        for (DatabaseColumn column : databaseTable.getDatabaseColumnsList()) {
             Field field;
             try {
                 field = entity.getClass().getDeclaredField(column.getName());

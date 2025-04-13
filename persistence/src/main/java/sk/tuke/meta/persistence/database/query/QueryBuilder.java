@@ -8,7 +8,6 @@ import sk.tuke.meta.persistence.entity.FKNameEntity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -35,7 +34,7 @@ public class QueryBuilder {
         List<FKNameEntity> foreignKeys = databaseTable.getForeignKeyList();
         boolean hasPrimaryKey = false;
 
-        for (DatabaseColumn databaseColumn : databaseTable.getDatabaseColumnList()) {
+        for (DatabaseColumn databaseColumn : databaseTable.getDatabaseColumnsList()) {
 
             query.append(databaseColumn.getSQLAlias()).append("\" ");
 
@@ -53,7 +52,7 @@ public class QueryBuilder {
             }
             if(databaseColumn.isPrimaryKey()) {
                 if(hasPrimaryKey) {
-                    throw new PersistenceException("More ten one primary key in table " + databaseTable.getSQLAlias());
+                    throw new PersistenceException("getCreateTableQuery: More ten one primary key in table " + databaseTable.getSQLAlias());
                 }
                 hasPrimaryKey = true;
                 query.append(" PRIMARY KEY AUTOINCREMENT");
@@ -96,7 +95,7 @@ public class QueryBuilder {
     public String getInsertQuery (DatabaseTable databaseTable) {
         String primaryKeyName = databaseTable.getPrimaryKey();
         StringBuilder query = new StringBuilder("INSERT INTO \"" + databaseTable.getSQLAlias() + "\" (\"");
-        for (DatabaseColumn databaseColumn : databaseTable.getDatabaseColumnList()) {
+        for (DatabaseColumn databaseColumn : databaseTable.getDatabaseColumnsList()) {
             if(!databaseColumn.getSQLAlias().equals(primaryKeyName)) {
                 query.append(databaseColumn.getSQLAlias()).append("\", \"");
             }
@@ -106,7 +105,7 @@ public class QueryBuilder {
         query.deleteCharAt(query.length() - 1);
         query.deleteCharAt(query.length() - 1);
         query.append("\") VALUES (");
-        query.append("?, ".repeat(Math.max(0, databaseTable.getDatabaseColumnList().size() - 1)));
+        query.append("?, ".repeat(Math.max(0, databaseTable.getDatabaseColumnsList().size() - 1)));
         query.deleteCharAt(query.length() - 1);
         query.deleteCharAt(query.length() - 1);
         query.append(") RETURNING \"").append(primaryKeyName).append("\"");
@@ -116,7 +115,7 @@ public class QueryBuilder {
     public String getUpdateQuery (DatabaseTable databaseTable) {
         String primaryKeyName = databaseTable.getPrimaryKey();
         StringBuilder query = new StringBuilder("UPDATE \"" + databaseTable.getSQLAlias() + "\" SET \"");
-        for (DatabaseColumn databaseColumn : databaseTable.getDatabaseColumnList()) {
+        for (DatabaseColumn databaseColumn : databaseTable.getDatabaseColumnsList()) {
             if(!databaseColumn.getSQLAlias().equals(primaryKeyName)) {
                 query.append(databaseColumn.getSQLAlias()).append("\" = ?, \"");
             }

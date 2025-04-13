@@ -111,4 +111,19 @@ public class DatabaseColumn {
         }
         return targetClass;
     }
+
+
+    // for refactoring
+
+    public String getFieldName() {
+        return name;
+    }
+
+    public String getSetterName() {
+        return "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
+    }
+
+    public String getGetterName() {
+        return "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
+    }
 }

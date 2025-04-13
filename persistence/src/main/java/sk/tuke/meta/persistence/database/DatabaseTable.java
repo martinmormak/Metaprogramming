@@ -2,47 +2,52 @@ package sk.tuke.meta.persistence.database;
 
 import sk.tuke.meta.persistence.PersistenceException;
 import sk.tuke.meta.persistence.annotations.Table;
+import sk.tuke.meta.persistence.database.query.QueryBuilder;
 import sk.tuke.meta.persistence.entity.FKNameEntity;
 
 import java.util.*;
 
 public class DatabaseTable {
+    private static final QueryBuilder queryBuilder = new QueryBuilder();
     private final String name;
     private final String SQLAlias;
-    private final List<DatabaseColumn> databaseColumnList;
+    private final String packageName;
+    private final List<DatabaseColumn> databaseColumnsList;
     private List<FKNameEntity> foreignKeyList;
     private boolean created;
 
-    public DatabaseTable(String name, String SQLAlias, List<DatabaseColumn> databaseColumnList, List<FKNameEntity> foreignKeyList, boolean created) {
+    public DatabaseTable(String name, String SQLAlias, String packageName, List<DatabaseColumn> databaseColumnsList, List<FKNameEntity> foreignKeyList, boolean created) {
         this.name = name;
         this.SQLAlias = SQLAlias;
-        this.databaseColumnList = databaseColumnList;
+        this.packageName = packageName;
+        this.databaseColumnsList = databaseColumnsList;
         this.created = created;
         this.foreignKeyList = foreignKeyList;
     }
 
-    public DatabaseTable(String name, String SQLAlias, List<DatabaseColumn> databaseColumnList, boolean created) {
+    public DatabaseTable(String name, String SQLAlias, String packageName, List<DatabaseColumn> databaseColumnsList, boolean created) {
         this.name = name;
         this.SQLAlias = SQLAlias;
-        this.databaseColumnList = databaseColumnList;
+        this.packageName = packageName;
+        this.databaseColumnsList = databaseColumnsList;
         this.created = created;
-        getForeignKeyList(databaseColumnList);
+        getForeignKeyList(databaseColumnsList);
     }
 
-    public DatabaseTable(String name, Table tableAnnotation, List<DatabaseColumn> databaseColumnList, List<FKNameEntity> foreignKeyList, boolean created) {
-        this(name, tableAnnotation.name(), databaseColumnList, foreignKeyList, created);
+    public DatabaseTable(String name, String packageName, Table tableAnnotation, List<DatabaseColumn> databaseColumnsList, List<FKNameEntity> foreignKeyList, boolean created) {
+        this(name, tableAnnotation.name(), packageName, databaseColumnsList, foreignKeyList, created);
     }
 
-    public DatabaseTable(String name, Table tableAnnotation, List<DatabaseColumn> databaseColumnList, boolean created) {
-        this(name, tableAnnotation.name(), databaseColumnList, created);
+    public DatabaseTable(String name, String packageName, Table tableAnnotation, List<DatabaseColumn> databaseColumnsList, boolean created) {
+        this(name, tableAnnotation.name(), packageName, databaseColumnsList, created);
     }
 
     public String getSQLAlias() {
         return SQLAlias==null || SQLAlias.isEmpty()?name:SQLAlias;
     }
 
-    public List<DatabaseColumn> getDatabaseColumnList() {
-        return databaseColumnList;
+    public List<DatabaseColumn> getDatabaseColumnsList() {
+        return databaseColumnsList;
     }
 
     public Integer getForeignKeyListSize() {
@@ -77,11 +82,108 @@ public class DatabaseTable {
     }
 
     public String getPrimaryKey() {
-        for(DatabaseColumn databaseColumn : databaseColumnList){
+        for(DatabaseColumn databaseColumn : databaseColumnsList){
             if(databaseColumn.isPrimaryKey()){
                 return databaseColumn.getSQLAlias();
             }
         }
         throw new PersistenceException("Primary keys doesn't exists");
+    }
+
+    // for refactoring
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDaoName() {
+        return name + "DAO";
+    }
+
+    public String getTableName() {
+        return name;
+    }
+
+    public DatabaseColumn getIdColumn() {
+        return new DatabaseColumn(Integer.class ,"id", "id", true, false, true);
+    }
+
+    public String getFullName() {
+        return packageName + "." + name;
+    }
+
+    public String getFullDaoName() {
+        return packageName + "." + getDaoName();
+    }
+
+    public String getCreateQuery() {
+        try {
+            return SQLReplacer(queryBuilder.getCreateTableQuery(this));
+        } catch (PersistenceException e) {
+            System.out.println(e.getMessage());
+            return "";
+        }
+    }
+
+    public String getInsertQuery() {
+        try {
+            return SQLReplacer(queryBuilder.getInsertQuery(this));
+        } catch (PersistenceException e) {
+            System.out.println(e.getMessage());
+            return "";
+        }
+    }
+
+    public String getUpdateQuery() {
+        try {
+            return SQLReplacer(queryBuilder.getUpdateQuery(this));
+        } catch (PersistenceException e) {
+            System.out.println(e.getMessage());
+            return "";
+        }
+    }
+
+    public String getOneItemById() {
+        try {
+            return SQLReplacer(queryBuilder.getOneItemById(this));
+        } catch (PersistenceException e) {
+            System.out.println(e.getMessage());
+            return "";
+        }
+    }
+
+    public String getSelectOneQuery() {
+        try {
+            return SQLReplacer(queryBuilder.getSelectOneQuery(this));
+        } catch (PersistenceException e) {
+            System.out.println(e.getMessage());
+            return "";
+        }
+    }
+
+    public String getSelectAllQuery() {
+        try {
+            return SQLReplacer(queryBuilder.getSelectAllQuery(this));
+        } catch (PersistenceException e) {
+            System.out.println(e.getMessage());
+            return "";
+        }
+    }
+
+    public String getDeleteQuery() {
+        try {
+            return SQLReplacer(queryBuilder.getDeleteQuery(this));
+        } catch (PersistenceException e) {
+            System.out.println(e.getMessage());
+            return "DELETE FROM \\\"" + getSQLAlias() + "\\\" WHERE ID = ?";
+        }
+    }
+
+    private String SQLReplacer (String sql) {
+        return sql.replace("\"","\\\"").replace("\n","\" + \n\"");
     }
 }

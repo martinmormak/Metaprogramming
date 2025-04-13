@@ -1,0 +1,105 @@
+package $entity.PackageName;
+
+import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
+
+import sk.tuke.meta.persistence.DAOPersistenceManager;
+import sk.tuke.meta.persistence.EntityDAO;
+import sk.tuke.meta.persistence.PersistenceException;
+
+public class $entity.DaoName implements EntityDAO<$entity.Name> {
+    private Connection connection;
+    private DAOPersistenceManager daoPersistenceManager;
+
+    public ${entity.DaoName}(DAOPersistenceManager daoPersistenceManager) {
+        this.connection = daoPersistenceManager.getConnection();
+        this.daoPersistenceManager = daoPersistenceManager;
+    }
+
+    @Override
+    public void createTable() {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "${entity.CreateQuery}");
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            throw new PersistenceException("Cannot create $entity.Name");
+        }
+    }
+
+    @Override
+    public Optional<$entity.Name> get(long id) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "${entity.SelectOneQuery}");
+            preparedStatement.setLong(1, id);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return Optional.of(getInstanceFromDatabase(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            throw new PersistenceException("Cannot Select One $entity.Name");
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public List<$entity.Name> getAll() {
+        return List.of();
+    }
+
+    @Override
+    public void save(Object entity) {
+    }
+
+    @Override
+    public void delete(Object obj) {
+        $entity.Name entity = ($entity.Name) obj;
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "${entity.DeleteQuery}");
+            preparedStatement.setLong(1, entity.${entity.IdColumn.GetterName}());
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            throw new PersistenceException("Cannot delete $entity.Name");
+        }
+    }
+
+    private $entity.Name getInstanceFromDatabase(ResultSet resultSet) {
+        try {
+            // Create an instance of the entity class
+            $entity.Name instance = null;
+            Field field = null;
+            // Dynamically iterate over the entity columns
+            #foreach ($column in $entity.DatabaseColumnsList)
+                #set($shortType = $column.Type)
+                #set($columnName = $column.Name)
+            field = ${entity.Name}.class.getDeclaredField("${columnName}");
+            field.setAccessible(true);
+            #if ($shortType == "class java.lang.String" || $shortType == "String")
+            field.set(instance, resultSet.getString("${columnName}" ));
+            #elseif ($shortType == "class java.lang.Long" || $shortType == "long")
+            field.set(instance, resultSet.getLong("${columnName}" ));
+            #elseif ($shortType == "class java.lang.Integer" || $shortType == "int")
+            field.set(instance, resultSet.getInt("${columnName}" ));
+            #elseif ($shortType == "class java.lang.Double" || $shortType == "double")
+            field.set(instance, resultSet.getDouble("${columnName}" ));
+            #elseif ($shortType == "class java.lang.Boolean" || $shortType == "boolean")
+            field.set(instance, resultSet.getBoolean("${columnName}" ));
+             #else
+             field.set(instance, resultSet.getObject("${columnName}" ));
+             #end
+            #end
+
+            return instance;
+        } catch (SQLException | NoSuchFieldException | IllegalAccessException e) {
+            throw new PersistenceException("Error creating $entity.Name from database result", e);
+        }
+    }
+}

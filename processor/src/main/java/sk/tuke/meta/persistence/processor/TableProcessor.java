@@ -111,7 +111,7 @@ public class TableProcessor extends AbstractProcessor {
                         SQLQueryBuilder.append(",\n");
                         SQLQueryBuilder.append(String.join(",\n", foreignKeys));
                     }*/
-                    SQLQueryBuilder.append(new QueryBuilder().getCreateTableQuery(new DatabaseTable(tableName, table, databaseColumns, foreignKeyList, false))).append("\n\n");
+                    SQLQueryBuilder.append(new QueryBuilder().getCreateTableQuery(new DatabaseTable(tableName, null, table, databaseColumns, foreignKeyList, false))).append("\n\n");
                 }
             }
 
