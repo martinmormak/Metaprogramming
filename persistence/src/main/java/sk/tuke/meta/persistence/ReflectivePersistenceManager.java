@@ -181,10 +181,6 @@ public class ReflectivePersistenceManager implements PersistenceManager {
             return;
         }
 
-        /*if (!PKExist(databaseTable, PK)) {
-            throw new PersistenceException("Object not found in database");
-        }*/
-
         String deleteQuery = queryBuilder.getDeleteQuery(databaseTable);
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery)) {

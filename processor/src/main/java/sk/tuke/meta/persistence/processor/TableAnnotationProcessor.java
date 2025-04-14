@@ -112,7 +112,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
 
             if (column == null) continue;
 
-            String columnName = (column != null && !column.name().isEmpty()) ? column.name() : variableElement.getSimpleName().toString();
+            String columnName = variableElement.getSimpleName().toString();
             Class<?> columnType;
 
             switch (variableElement.asType().toString()) {
@@ -129,7 +129,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                     columnType = String.class;
                     break;
                 default:
-                    columnType = Integer.class;
+                    columnType = Object.class;
                     isFK = true;
                     TypeMirror targetTypeMirror = getTargetTypeMirror(column);
                     if (targetTypeMirror != null) {

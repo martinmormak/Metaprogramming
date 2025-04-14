@@ -97,7 +97,7 @@ public class DatabaseColumn {
     private static Class<?> getTargetClass (Column columnAnnotation){
         TypeMirror typeMirror = null;
         try {
-            columnAnnotation.targetClass(); // This triggers MirroredTypeException
+            return columnAnnotation.targetClass(); // This triggers MirroredTypeException
         } catch (MirroredTypeException e) {
             typeMirror = e.getTypeMirror(); // Correct way to get the TypeMirror
         }
