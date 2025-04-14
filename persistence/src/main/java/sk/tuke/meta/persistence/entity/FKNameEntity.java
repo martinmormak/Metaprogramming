@@ -5,16 +5,16 @@ import sk.tuke.meta.persistence.annotations.Table;
 public class FKNameEntity {
     private final String javaName;
     private final String SQLAlias;
-    private final Class<?> targetClass;
+    private final String targetClass;
     private String referencedTable = "";
 
-    public FKNameEntity (String javaName, String SQLAlias, Class<?> targetClass) {
+    public FKNameEntity (String javaName, String SQLAlias, String targetClass) {
         this.javaName = javaName;
         this.SQLAlias = SQLAlias;
         this.targetClass = targetClass;
     }
 
-    public FKNameEntity (String javaName, String SQLAlias, Class<?> targetClass, String referencedTable) {
+    public FKNameEntity (String javaName, String SQLAlias, String targetClass, String referencedTable) {
         this.javaName = javaName;
         this.SQLAlias = SQLAlias;
         this.targetClass = targetClass;
@@ -29,8 +29,8 @@ public class FKNameEntity {
         return SQLAlias;
     }
 
-    public Class<?> getTargetClass() {
-        return targetClass;
+    public String getTargetClass() {
+        return targetClass.substring(targetClass.lastIndexOf('.') + 1);
     }
 
     public String getReferencedTable() {

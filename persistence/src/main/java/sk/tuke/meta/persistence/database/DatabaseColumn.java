@@ -16,11 +16,11 @@ public class DatabaseColumn {
     private final boolean nullable;
     private final boolean unique;
     private final boolean lazyFetch;
-    private final Class<?> targetClass;
+    private final String targetClass;
     private String referencedTableName = "";
     private final boolean isPrimaryKey;
     public DatabaseColumn(Class<?> type, String name, String columnName, boolean nullable, boolean unique,
-                          boolean lazyFetch, Class<?> targetClass, boolean isPrimaryKey) {
+                          boolean lazyFetch, String targetClass, boolean isPrimaryKey) {
         this.type = type;
         this.name = name;
         this.columnName = columnName;
@@ -32,17 +32,17 @@ public class DatabaseColumn {
     }
 
     public DatabaseColumn(Class<?> type, String name, boolean nullable, boolean unique,
-                          boolean lazyFetch, Class<?> targetClass, boolean isPrimaryKey) {
+                          boolean lazyFetch, String targetClass, boolean isPrimaryKey) {
         this(type, name, name, nullable, unique, lazyFetch, targetClass, isPrimaryKey);
     }
 
 
     public DatabaseColumn(Class<?> type, String name, String columnName, boolean nullable, boolean unique, boolean isPrimaryKey) {
-        this(type, name, columnName, nullable, unique, false, void.class, isPrimaryKey);
+        this(type, name, columnName, nullable, unique, false, "void", isPrimaryKey);
     }
 
     public DatabaseColumn(Class<?> type, String name, boolean nullable, boolean unique, boolean isPrimaryKey) {
-        this(type, name, name, nullable, unique, false, void.class, isPrimaryKey);
+        this(type, name, name, nullable, unique, false, "void", isPrimaryKey);
     }
 
     public DatabaseColumn(Class<?> type, String name, Column columnAnnotation, boolean isPrimaryKey) {
@@ -78,8 +78,8 @@ public class DatabaseColumn {
         return lazyFetch;
     }
 
-    public Class<?> getTargetClass() {
-        return targetClass;
+    public String getTargetClass() {
+        return targetClass.substring(targetClass.lastIndexOf('.') + 1);
     }
 
     public boolean isPrimaryKey() {
@@ -94,22 +94,16 @@ public class DatabaseColumn {
         return new FKNameEntity(name, columnName, targetClass, referencedTableName);
     }
 
-    private static Class<?> getTargetClass (Column columnAnnotation){
+    private static String getTargetClass (Column columnAnnotation){
         TypeMirror typeMirror = null;
         try {
-            return columnAnnotation.targetClass(); // This triggers MirroredTypeException
+            System.out.println("columnAnnotation.targetClass()" + columnAnnotation.targetClass());
+            return columnAnnotation.targetClass().getSimpleName(); // This triggers MirroredTypeException
         } catch (MirroredTypeException e) {
             typeMirror = e.getTypeMirror(); // Correct way to get the TypeMirror
         }
-        Class<?> targetClass = void.class;
-        if (typeMirror != null && !typeMirror.toString().equals("void")) {
-            try {
-                targetClass = Class.forName(typeMirror.toString());
-            } catch (ClassNotFoundException e) {
-                targetClass = Object.class; // best effort
-            }
-        }
-        return targetClass;
+        System.out.println("typeMirror " + typeMirror);
+        return typeMirror.toString();
     }
 
 

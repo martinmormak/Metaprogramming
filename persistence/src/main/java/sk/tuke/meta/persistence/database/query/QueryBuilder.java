@@ -74,7 +74,7 @@ public class QueryBuilder {
         }
 
         for (FKNameEntity foreignKey : foreignKeys) {
-            query.append("FOREIGN KEY (\"").append(foreignKey.getSQLAlias()).append("\") REFERENCES \"").append(foreignKey.getTargetClass().getSimpleName()).append("\" ( ID ) ON DELETE SET NULL");
+            query.append("FOREIGN KEY (\"").append(foreignKey.getSQLAlias()).append("\") REFERENCES \"").append(foreignKey.getTargetClass()).append("\" ( ID ) ON DELETE SET NULL");
             query.append(",\n");
         }
         query.deleteCharAt(query.length() - 1);
