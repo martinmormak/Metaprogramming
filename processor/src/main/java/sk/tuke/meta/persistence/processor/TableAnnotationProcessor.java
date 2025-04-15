@@ -125,7 +125,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                 case "float", "java.lang.Float", "double", "java.lang.Double":
                     columnType = float.class;
                     break;
-                case "java.lang.String":
+                case "string", "java.lang.String":
                     columnType = String.class;
                     break;
                 default:
