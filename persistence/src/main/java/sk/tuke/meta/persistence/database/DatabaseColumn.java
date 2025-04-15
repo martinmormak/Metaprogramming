@@ -1,9 +1,11 @@
 package sk.tuke.meta.persistence.database;
 
 import sk.tuke.meta.persistence.annotations.Column;
+import sk.tuke.meta.persistence.annotations.Id;
 import sk.tuke.meta.persistence.annotations.Table;
 import sk.tuke.meta.persistence.entity.FKNameEntity;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypeException;
@@ -90,8 +92,25 @@ public class DatabaseColumn {
         return columnName==null || columnName.isEmpty() ?name:columnName;
     }
 
-    public FKNameEntity getForeignKey() {
-        return new FKNameEntity(name, columnName, targetClass, referencedTableName);
+    public FKNameEntity getForeignKey(ProcessingEnvironment processingEnv) {
+        String pkName = "id";
+        String SQLAlias = "id";
+        TypeElement targetClassElement = processingEnv
+                .getElementUtils()
+                .getTypeElement(targetClass);
+
+        if (targetClassElement != null) {
+            for (Element element : targetClassElement.getEnclosedElements()) {
+                System.out.println("element "+element);
+                if (element.getKind().isField() && element.getAnnotation(Id.class) != null) {
+                    pkName = element.getSimpleName().toString();
+                    Column column = element.getAnnotation(Column.class);
+                    SQLAlias = column.name().isEmpty() ? element.getSimpleName().toString() : column.name();
+                    break;
+                }
+            }
+        }
+        return new FKNameEntity(name, columnName, targetClass, pkName, SQLAlias, referencedTableName);
     }
 
     private static String getTargetClass (Column columnAnnotation){

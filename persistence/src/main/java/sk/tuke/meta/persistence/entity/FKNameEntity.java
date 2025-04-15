@@ -6,18 +6,24 @@ public class FKNameEntity {
     private final String javaName;
     private final String SQLAlias;
     private final String targetClass;
+    private final String pkFieldName;
+    private final String SQLFieldName;
     private String referencedTable = "";
 
-    public FKNameEntity (String javaName, String SQLAlias, String targetClass) {
+    public FKNameEntity (String javaName, String SQLAlias, String targetClass, String pkFieldName, String SQLFieldName) {
         this.javaName = javaName;
         this.SQLAlias = SQLAlias;
         this.targetClass = targetClass;
+        this.pkFieldName = pkFieldName;
+        this.SQLFieldName = SQLFieldName;
     }
 
-    public FKNameEntity (String javaName, String SQLAlias, String targetClass, String referencedTable) {
+    public FKNameEntity (String javaName, String SQLAlias, String targetClass, String pkFieldName, String SQLFieldName, String referencedTable) {
         this.javaName = javaName;
         this.SQLAlias = SQLAlias;
         this.targetClass = targetClass;
+        this.pkFieldName = pkFieldName;
+        this.SQLFieldName = SQLFieldName;
         this.referencedTable = referencedTable;
     }
 
@@ -35,5 +41,21 @@ public class FKNameEntity {
 
     public String getReferencedTable() {
         return referencedTable;
+    }
+
+    public String getPKFieldName() {
+        return pkFieldName;
+    }
+
+    public String getSQLFieldName() {
+        return SQLFieldName;
+    }
+
+    public String getFieldGetterName() {
+        return "get" + javaName.substring(0, 1).toUpperCase() + javaName.substring(1);
+    }
+
+    public String getPKGetterName() {
+        return "get" + pkFieldName.substring(0, 1).toUpperCase() + pkFieldName.substring(1);
     }
 }

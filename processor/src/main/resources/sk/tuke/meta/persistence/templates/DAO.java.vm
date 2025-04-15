@@ -3,10 +3,7 @@ package $entity.PackageName;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -72,6 +69,143 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
 
     @Override
     public void save(Object entity) {
+        $entity.Name realObject = null;
+        if (Proxy.isProxyClass(entity.getClass())) {
+            System.out.println("entity was proxy");
+            InvocationHandler handler = Proxy.getInvocationHandler(entity);
+
+            if (handler instanceof LazyProxyHandler lazyHandler) {
+                System.out.println("proxy is LazyProxyHandler");
+                if (!lazyHandler.isInitialized()) {
+                    System.out.println("proxy is unitialized");
+                    return;
+                }
+                System.out.println("proxy is itialized");
+                realObject = ($entity.Name) lazyHandler.getRealObject();
+            }
+        }
+        if(realObject == null) {
+            realObject = ($entity.Name) entity;
+        }
+        Object PK = realObject.${entity.IdColumn.GetterName}();
+
+        try {
+            if (!checkForeignKeysExists(realObject)) {
+                throw new PersistenceException("Foreign keys doesn't exists");
+            }
+            if (PKExist("${entity.Name}", "${entity.PrimaryKey}", PK)) {
+                try (PreparedStatement preparedStatement = connection.prepareStatement("${entity.UpdateQuery}")) {
+                    #set($i = 1)
+                    #foreach ($column in $entity.DatabaseColumnsList)
+                        #set($shortType = $column.Type)
+                        #set($columnName = $column.Name)
+                        #set($methodSuffix = $columnName.substring(0, 1).toUpperCase() + $columnName.substring(1))
+                        #if ($columnName != $entity.IdColumn.Name)  ## Skip the ID column
+                            #if ($shortType == "class java.lang.String" || $shortType == "String")
+                    preparedStatement.setString($i, realObject.get${methodSuffix}());
+                            #elseif ($shortType == "class java.lang.Long" || $shortType == "long")
+                    preparedStatement.setLong($i, realObject.get${methodSuffix}());
+                            #elseif ($shortType == "class java.lang.Integer" || $shortType == "int")
+                    preparedStatement.setInt($i, realObject.get${methodSuffix}());
+                            #elseif ($shortType == "class java.lang.Double" || $shortType == "double")
+                    preparedStatement.setDouble($i, realObject.get${methodSuffix}());
+                            #elseif ($shortType == "class java.lang.Boolean" || $shortType == "boolean")
+                    preparedStatement.setBoolean($i, realObject.get${methodSuffix}());
+                            #else
+                                #foreach($fk in $entity.ForeignKeyList)
+                                    #if($fk.SQLAlias.contains($columnName) || $fk.JavaName.contains($columnName))
+                    long id = -1;
+                    if (Proxy.isProxyClass(entity.getClass())) {
+                        InvocationHandler handler = Proxy.getInvocationHandler(entity);
+
+                        if (handler instanceof LazyProxyHandler<?>) {
+                            LazyProxyHandler lazyHandler = (LazyProxyHandler) handler;
+                            if (!lazyHandler.isInitialized()) {
+                                //return -1;
+                                throw new PersistenceException("Proxu is not initialized " + entity);
+                            }
+
+                            id = lazyHandler.getId();
+                        }
+                    }
+
+                    if (id == -1) {
+                        ${fk.JavaName.substring(0,1).toUpperCase()}${fk.JavaName.substring(1)} reference = realObject.${fk.FieldGetterName}();
+                        id = (reference != null && reference instanceof ${fk.TargetClass}) ? ((${fk.TargetClass}) reference).${fk.PKGetterName}() : null;
+                    }
+
+                    preparedStatement.setLong($i, id);
+                                    #else
+                    preparedStatement.setObject($i, realObject.get${methodSuffix}());
+                                    #end
+                                #end
+                            #end
+                            #set($i = $i + 1)
+                        #end
+                    #end
+                    preparedStatement.setLong($i, realObject.${entity.IdColumn.GetterName}());
+
+                    preparedStatement.executeUpdate();
+                }
+            } else {
+                try (PreparedStatement preparedStatement = connection.prepareStatement("${entity.InsertQuery}", Statement.RETURN_GENERATED_KEYS)) {
+                    #set($i = 1)
+                    #foreach ($column in $entity.DatabaseColumnsList)
+                        #set($shortType = $column.Type)
+                        #set($columnName = $column.Name)
+                        #set($methodSuffix = $columnName.substring(0, 1).toUpperCase() + $columnName.substring(1))
+                        #if ($columnName != $entity.IdColumn.Name)  ## Skip the ID column
+                            #if ($shortType == "class java.lang.String" || $shortType == "String")
+                    preparedStatement.setString($i, realObject.get${methodSuffix}());
+                            #elseif ($shortType == "class java.lang.Long" || $shortType == "long")
+                    preparedStatement.setLong($i, realObject.get${methodSuffix}());
+                            #elseif ($shortType == "class java.lang.Integer" || $shortType == "int")
+                    preparedStatement.setInt($i, realObject.get${methodSuffix}());
+                            #elseif ($shortType == "class java.lang.Double" || $shortType == "double")
+                    preparedStatement.setDouble($i, realObject.get${methodSuffix}());
+                            #elseif ($shortType == "class java.lang.Boolean" || $shortType == "boolean")
+                    preparedStatement.setBoolean($i, realObject.get${methodSuffix}());
+                            #else
+                                #foreach($fk in $entity.ForeignKeyList)
+                                    #if($fk.SQLAlias.contains($columnName) || $fk.JavaName.contains($columnName))
+                    long id = -1;
+                    if (Proxy.isProxyClass(entity.getClass())) {
+                        InvocationHandler handler = Proxy.getInvocationHandler(entity);
+
+                        if (handler instanceof LazyProxyHandler<?>) {
+                            LazyProxyHandler lazyHandler = (LazyProxyHandler) handler;
+                            if (!lazyHandler.isInitialized()) {
+                                //return -1;
+                                throw new PersistenceException("Proxu is not initialized " + entity);
+                            }
+
+                            id = lazyHandler.getId();
+                        }
+                    }
+
+                    if (id == -1) {
+                        ${fk.JavaName.substring(0,1).toUpperCase()}${fk.JavaName.substring(1)} reference = realObject.${fk.FieldGetterName}();
+                        id = (reference != null && reference instanceof ${fk.TargetClass}) ? ((${fk.TargetClass}) reference).${fk.PKGetterName}() : null;
+                    }
+
+                    preparedStatement.setLong($i, id);
+                                    #else
+                    preparedStatement.setObject($i, realObject.get${methodSuffix}());
+                                    #end
+                                #end
+                            #end
+                            #set($i = $i + 1)
+                        #end
+                    #end
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    if (resultSet.next()) {
+                        realObject.${entity.IdColumn.SetterName}(resultSet.getLong(1));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new PersistenceException("ID field not found for entity " + entity, e);
+        }
     }
 
     @Override
@@ -155,6 +289,46 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
             return instance;
         } catch (SQLException e) {
             throw new PersistenceException("Error creating $entity.Name from database result", e);
+        }
+    }
+
+    private boolean checkForeignKeysExists($entity.Name entity) {
+        #foreach ($fieldNameEntity in $entity.ForeignKeyList)
+        // TODO: this must use note entity but use field
+        Object PK = null;
+        if (Proxy.isProxyClass(entity.getClass())) {
+            InvocationHandler handler = Proxy.getInvocationHandler(entity);
+
+            if (handler instanceof LazyProxyHandler lazyHandler) {
+                System.out.println("proxy is LazyProxyHandler");
+                PK = lazyHandler.getId();
+            }
+        }
+
+        if (PK == null) {
+            ${fieldNameEntity.JavaName.substring(0,1).toUpperCase()}${fieldNameEntity.JavaName.substring(1)} reference = entity.${fieldNameEntity.FieldGetterName}();
+            PK = (reference != null && reference instanceof ${fieldNameEntity.TargetClass}) ? ((${fieldNameEntity.TargetClass}) reference).${fieldNameEntity.PKGetterName}() : null;
+        }
+
+        if (PK != null) {
+            if (!PKExist("${fieldNameEntity.ReferencedTable}", "${fieldNameEntity.SQLFieldName}", PK)) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+        #end
+        return true;
+    }
+
+    private boolean PKExist(String databaseName, String databaseColumn, Object PK) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT 1 FROM \"" + databaseName + "\" WHERE \"" + databaseColumn + "\" = ?")) {
+            preparedStatement.setObject(1, PK);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSet.next();
+            }
+        } catch (SQLException e) {
+            return false;
         }
     }
 }
