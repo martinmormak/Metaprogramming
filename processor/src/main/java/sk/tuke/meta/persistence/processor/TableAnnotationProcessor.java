@@ -115,6 +115,8 @@ public class TableAnnotationProcessor extends AbstractProcessor {
             String columnName = variableElement.getSimpleName().toString();
             Class<?> columnType;
 
+            System.out.println("variableElement " + variableElement);
+            System.out.println("variableElement.asType() " + variableElement.asType());
             switch (variableElement.asType().toString()) {
                 case "long", "java.lang.Long":
                     columnType = long.class;
