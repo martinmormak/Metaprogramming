@@ -97,12 +97,10 @@ public class DatabaseColumn {
     private static String getTargetClass (Column columnAnnotation){
         TypeMirror typeMirror = null;
         try {
-            System.out.println("columnAnnotation.targetClass()" + columnAnnotation.targetClass());
             return columnAnnotation.targetClass().getSimpleName(); // This triggers MirroredTypeException
         } catch (MirroredTypeException e) {
             typeMirror = e.getTypeMirror(); // Correct way to get the TypeMirror
         }
-        System.out.println("typeMirror " + typeMirror);
         return typeMirror.toString();
     }
 

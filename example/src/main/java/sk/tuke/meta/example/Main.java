@@ -34,6 +34,15 @@ public class Main {
         hrasko.setIDepartment(department);
         manager.save(hrasko);
 
+        Optional<Person> onePerson = manager.get(Person.class, hrasko.getId());
+
+        System.out.println("List One Persons");
+        if(onePerson.isPresent()) {
+            System.out.println(onePerson.get());
+            IDepartment onePersonIDepartment = onePerson.get().getIDepartment();
+            System.out.println("- " + onePersonIDepartment.toString());
+        }
+
         System.out.println("List All Persons");
         List<Person> persons = manager.getAll(Person.class);
         for (Person person : persons) {
