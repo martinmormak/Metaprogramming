@@ -312,8 +312,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
         }
 
         if (PK == null) {
-            ${fieldNameEntity.JavaName.substring(0,1).toUpperCase()}${fieldNameEntity.JavaName.substring(1)} reference = entity.${fieldNameEntity.FieldGetterName}();
-            PK = (reference != null && reference instanceof ${fieldNameEntity.TargetClass}) ? ((${fieldNameEntity.TargetClass}) reference).${fieldNameEntity.PKGetterName}() : null;
+            PK = (entity.${fieldNameEntity.FieldGetterName}() != null && entity.${fieldNameEntity.FieldGetterName}() instanceof ${fieldNameEntity.TargetClass}) ? ((${fieldNameEntity.TargetClass}) entity.${fieldNameEntity.FieldGetterName}()).${fieldNameEntity.PKGetterName}() : null;
         }
 
         if (PK != null) {
