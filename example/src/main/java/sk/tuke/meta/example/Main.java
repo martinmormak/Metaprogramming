@@ -70,7 +70,7 @@ public class Main {
         for (Person person : persons) {
             System.out.println(person);
             IDepartment personIDepartment = person.getIDepartment();
-            if (personIDepartment == null) {
+            if (personIDepartment != null) {
                 System.out.println("- " + personIDepartment.toString());
             }
         }
@@ -82,7 +82,7 @@ public class Main {
         for (Person person : persons) {
             System.out.println(person);
             IDepartment personIDepartment = person.getIDepartment();
-            if (personIDepartment == null) {
+            if (personIDepartment != null) {
                 System.out.println("- " + personIDepartment.toString());
             }
         }

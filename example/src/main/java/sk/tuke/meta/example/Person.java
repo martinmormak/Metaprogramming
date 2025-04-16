@@ -15,7 +15,7 @@ public class Person {
     private String name;
     @Column
     private int age;
-    @Column(name = "Department", lazyFetch = true, targetClass = Department.class)
+    @Column(name = "Department", lazyFetch = false, targetClass = Department.class)
     private IDepartment iDepartment;
 
     public Person() {

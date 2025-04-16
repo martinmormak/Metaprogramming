@@ -148,6 +148,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                                     ? targetClassElement.getSimpleName().toString()
                                     : referencedTable.name();
                         }
+                        System.out.println("targetTypeMirror " + targetTypeMirror);
                     }
                     break;
             }
