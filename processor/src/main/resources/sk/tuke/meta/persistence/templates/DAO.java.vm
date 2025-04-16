@@ -132,8 +132,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                     }
 
                     if (id == null) {
-                        ${fk.JavaName.substring(0,1).toUpperCase()}${fk.JavaName.substring(1)} reference = realObject.${fk.FieldGetterName}();
-                        id = (reference != null && reference instanceof ${fk.TargetClass}) ? ((${fk.TargetClass}) reference).${fk.PKGetterName}() : null;
+                        id = (realObject.${fk.FieldGetterName}() != null && realObject.${fk.FieldGetterName}() instanceof ${fk.TargetClass}) ? ((${fk.TargetClass}) realObject.${fk.FieldGetterName}()).${fk.PKGetterName}() : null;
                     }
 
                     if (id != null) {
@@ -190,8 +189,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                     }
 
                     if (id == -1) {
-                        ${fk.JavaName.substring(0,1).toUpperCase()}${fk.JavaName.substring(1)} reference = realObject.${fk.FieldGetterName}();
-                        id = (reference != null && reference instanceof ${fk.TargetClass}) ? ((${fk.TargetClass}) reference).${fk.PKGetterName}() : null;
+                        id = (realObject.${fk.FieldGetterName}() != null && realObject.${fk.FieldGetterName}() instanceof ${fk.TargetClass}) ? ((${fk.TargetClass}) realObject.${fk.FieldGetterName}()).${fk.PKGetterName}() : null;
                     }
 
                     preparedStatement.setLong($i, id);
