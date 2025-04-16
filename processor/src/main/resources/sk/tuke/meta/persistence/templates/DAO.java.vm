@@ -284,7 +284,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
             ));
                         #else
             // Bežné načítanie cudzieho kľúča
-            Optional<?> optionalValue = daoPersistenceManager.get(field.getType(), resultSet.getLong("$SQLAlias"));
+            Optional<?> optionalValue = daoPersistenceManager.get(${column.TargetClass}.class, resultSet.getLong("$SQLAlias"));
             instance.set${methodSuffix}((${methodSuffix}) optionalValue.orElse(null));
                         #end
                     #else
