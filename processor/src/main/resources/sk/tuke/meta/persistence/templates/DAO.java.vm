@@ -90,6 +90,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
         Object PK = realObject.${entity.IdColumn.GetterName}();
 
         try {
+            Long id = null;
             if (!checkForeignKeysExists(realObject)) {
                 throw new PersistenceException("Foreign keys doesn't exists");
             }
@@ -116,7 +117,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                             #else
                                 #foreach($fk in $entity.ForeignKeyList)
                                     #if($fk.SQLAlias.contains($columnName) || $fk.JavaName.contains($columnName))
-                    Long id = null;
+                    id = null;
                     if (Proxy.isProxyClass(entity.getClass())) {
                         InvocationHandler handler = Proxy.getInvocationHandler(entity);
 
@@ -173,7 +174,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                             #else
                                 #foreach($fk in $entity.ForeignKeyList)
                                     #if($fk.SQLAlias.contains($columnName) || $fk.JavaName.contains($columnName))
-                    Long id = null;
+                    id = null;
                     if (Proxy.isProxyClass(entity.getClass())) {
                         InvocationHandler handler = Proxy.getInvocationHandler(entity);
 
@@ -301,9 +302,10 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
     }
 
     private boolean checkForeignKeysExists($entity.Name entity) {
+        Object PK = null;
         #foreach ($fieldNameEntity in $entity.ForeignKeyList)
         // TODO: this must use note entity but use field
-        Object PK = null;
+        PK = null;
         if (Proxy.isProxyClass(entity.getClass())) {
             InvocationHandler handler = Proxy.getInvocationHandler(entity);
 
