@@ -173,7 +173,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                             #else
                                 #foreach($fk in $entity.ForeignKeyList)
                                     #if($fk.SQLAlias.contains($columnName) || $fk.JavaName.contains($columnName))
-                    long id = -1;
+                    Long id = null;
                     if (Proxy.isProxyClass(entity.getClass())) {
                         InvocationHandler handler = Proxy.getInvocationHandler(entity);
 
@@ -188,11 +188,15 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                         }
                     }
 
-                    if (id == -1) {
+                    if (id == null) {
                         id = (realObject.${fk.FieldGetterName}() != null && realObject.${fk.FieldGetterName}() instanceof ${fk.TargetClass}) ? ((${fk.TargetClass}) realObject.${fk.FieldGetterName}()).${fk.PKGetterName}() : null;
                     }
 
-                    preparedStatement.setLong($i, id);
+                    if (id != null) {
+                        preparedStatement.setLong($i, id);
+                    } else {
+                        preparedStatement.setNull($i, java.sql.Types.BIGINT);
+                    }
                                     #else
                     preparedStatement.setObject($i, realObject.get${methodSuffix}());
                                     #end
@@ -271,7 +275,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                     #if (${isForeignKey})
                         #if (${lazyFetch})
             // Vytvorenie proxy na oneskorené načítanie
-            long foreignKeyId = resultSet.getLong("$SQLAlias");
+            Long foreignKeyId = resultSet.getLong("$SQLAlias");
             instance.set${methodSuffix}((${methodSuffix}) LazyProxyHandler.createProxy(
                 ${methodSuffix}.class,
                 ${column.TargetClass}.class,
