@@ -124,8 +124,11 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                 case "int", "java.lang.Integer":
                     columnType = Integer.class;
                     break;
-                case "float", "java.lang.Float", "double", "java.lang.Double":
+                case "float", "java.lang.Float":
                     columnType = float.class;
+                    break;
+                case "double", "java.lang.Double":
+                    columnType = double.class;
                     break;
                 case "string", "java.lang.String":
                     columnType = String.class;
@@ -148,6 +151,8 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                     }
                     break;
             }
+
+            System.out.println("columnType " + columnType);
 
             DatabaseColumn databaseColumn = new DatabaseColumn(columnType, columnName, column, referencedTableName, id!=null);
             databaseColumns.add(databaseColumn);

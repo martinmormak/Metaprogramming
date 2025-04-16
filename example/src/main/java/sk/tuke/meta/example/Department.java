@@ -13,13 +13,16 @@ public class Department implements IDepartment {
     private String name;
     @Column
     private String code;
+    @Column
+    private double floor;
 
     public Department() {
     }
 
-    public Department(String name, String code) {
+    public Department(String name, String code, double floor) {
         this.name = name;
         this.code = code;
+        this.floor = floor;
     }
 
     public long getId() {
@@ -44,6 +47,14 @@ public class Department implements IDepartment {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public double getFloor() {
+        return floor;
+    }
+
+    public void setFloor(double floor) {
+        this.floor = floor;
     }
 
     public String toString() {

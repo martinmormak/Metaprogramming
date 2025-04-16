@@ -107,6 +107,8 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                     preparedStatement.setLong($i, realObject.get${methodSuffix}());
                             #elseif ($shortType == "class java.lang.Integer" || $shortType == "int")
                     preparedStatement.setInt($i, realObject.get${methodSuffix}());
+                            #elseif ($shortType == "class java.lang.Float" || $shortType == "float")
+                    preparedStatement.setFloat($i, realObject.get${methodSuffix}());
                             #elseif ($shortType == "class java.lang.Double" || $shortType == "double")
                     preparedStatement.setDouble($i, realObject.get${methodSuffix}());
                             #elseif ($shortType == "class java.lang.Boolean" || $shortType == "boolean")
@@ -114,7 +116,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                             #else
                                 #foreach($fk in $entity.ForeignKeyList)
                                     #if($fk.SQLAlias.contains($columnName) || $fk.JavaName.contains($columnName))
-                    long id = -1;
+                    Long id = null;
                     if (Proxy.isProxyClass(entity.getClass())) {
                         InvocationHandler handler = Proxy.getInvocationHandler(entity);
 
@@ -129,12 +131,16 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                         }
                     }
 
-                    if (id == -1) {
+                    if (id == null) {
                         ${fk.JavaName.substring(0,1).toUpperCase()}${fk.JavaName.substring(1)} reference = realObject.${fk.FieldGetterName}();
                         id = (reference != null && reference instanceof ${fk.TargetClass}) ? ((${fk.TargetClass}) reference).${fk.PKGetterName}() : null;
                     }
 
-                    preparedStatement.setLong($i, id);
+                    if (id != null) {
+                        preparedStatement.setLong($i, id);
+                    } else {
+                        preparedStatement.setNull($i, java.sql.Types.BIGINT);
+                    }
                                     #else
                     preparedStatement.setObject($i, realObject.get${methodSuffix}());
                                     #end

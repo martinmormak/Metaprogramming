@@ -26,7 +26,7 @@ public class Main {
 
     private static void exampleOperations(PersistenceManager manager) {
         System.out.println("Save Department");
-        Department department = new Department("department", "DVLP");
+        Department department = new Department("department", "DVLP",5);
         manager.save(department);
 
         System.out.println("Save Hrasko");
