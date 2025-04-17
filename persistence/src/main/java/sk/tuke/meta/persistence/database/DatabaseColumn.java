@@ -31,7 +31,15 @@ public class DatabaseColumn {
         this.lazyFetch = lazyFetch;
         this.targetClass = targetClass;
         this.isPrimaryKey = isPrimaryKey;
+        System.out.println();
+        System.out.println("DatabaseColumn: type " + type);
+        System.out.println("DatabaseColumn: name " + name);
+        System.out.println("DatabaseColumn: columnName " + columnName);
+        System.out.println("DatabaseColumn: nullable " + nullable);
+        System.out.println("DatabaseColumn: unique " + unique);
+        System.out.println("DatabaseColumn: lazyFetch " + lazyFetch);
         System.out.println("DatabaseColumn: targetClass " + targetClass);
+        System.out.println("DatabaseColumn: isPrimaryKey " + isPrimaryKey);
     }
 
     public DatabaseColumn(Class<?> type, String name, boolean nullable, boolean unique,
@@ -55,6 +63,7 @@ public class DatabaseColumn {
     public DatabaseColumn(Class<?> type, String name, Column columnAnnotation, String referencedTableName, boolean isPrimaryKey) {
         this(type, name, columnAnnotation.name(), columnAnnotation.nullable(), columnAnnotation.unique(), columnAnnotation.lazyFetch(), getTargetClass(columnAnnotation), isPrimaryKey);
         this.referencedTableName = referencedTableName;
+        System.out.println("DatabaseColumn: referencedTableName " + referencedTableName);
     }
 
     public Class<?> getType() {
@@ -105,11 +114,11 @@ public class DatabaseColumn {
                 .getElementUtils()
                 .getTypeElement(targetClass);
 
-        System.out.println("DatabaseColumn - getForeignKey: targetClass = " + targetClass);
+        //System.out.println("DatabaseColumn - getForeignKey: targetClass = " + targetClass);
 
         if (targetClassElement != null) {
             for (Element element : targetClassElement.getEnclosedElements()) {
-                System.out.println("DatabaseColumn - getTargetClass: element "+element);
+                //System.out.println("DatabaseColumn - getTargetClass: element " + element);
                 if (element.getKind().isField() && element.getAnnotation(Id.class) != null) {
                     pkName = element.getSimpleName().toString();
                     Column column = element.getAnnotation(Column.class);
@@ -126,20 +135,20 @@ public class DatabaseColumn {
             }
         }
 
-        System.out.println("DatabaseColumn - targetClass = " + targetClassElement);
-        System.out.println("DatabaseColumn - referencedTableName = " + resolvedReferencedTableName);
+        System.out.println("DatabaseColumn - referencedTableName = " + referencedTableName);
+        System.out.println("DatabaseColumn - resolvedReferencedTableName = " + resolvedReferencedTableName);
 
-        return new FKNameEntity(name, columnName, lazyFetch, getTargetClass(), pkName, SQLAlias, referencedTableName);
+        return new FKNameEntity(name, columnName, lazyFetch, getTargetClass(), pkName, SQLAlias, resolvedReferencedTableName);
     }
 
     private static String getTargetClass (Column columnAnnotation){
         TypeMirror typeMirror = null;
         try {
-            System.out.println("DatabaseColumn - getTargetClass: columnAnnotation.targetClass().getSimpleName() " + columnAnnotation.targetClass().getSimpleName());
+            //System.out.println("DatabaseColumn - getTargetClass: columnAnnotation.targetClass().getSimpleName() " + columnAnnotation.targetClass().getSimpleName());
             return columnAnnotation.targetClass().getSimpleName(); // This triggers MirroredTypeException
         } catch (MirroredTypeException e) {
-            System.out.println("DatabaseColumn - getTargetClass: e " + e);
-            System.out.println("DatabaseColumn - getTargetClass: e.getTypeMirror() " + e.getTypeMirror());
+            //System.out.println("DatabaseColumn - getTargetClass: e " + e);
+            //System.out.println("DatabaseColumn - getTargetClass: e.getTypeMirror() " + e.getTypeMirror());
             typeMirror = e.getTypeMirror(); // Correct way to get the TypeMirror
         }
         return typeMirror.toString();

@@ -18,6 +18,13 @@ public class FKNameEntity {
         this.targetClass = targetClass;
         this.pkFieldName = pkFieldName;
         this.SQLFieldName = SQLFieldName;
+        System.out.println();
+        System.out.println("FKNameEntity: javaName " + javaName);
+        System.out.println("FKNameEntity: SQLAlias " + SQLAlias);
+        System.out.println("FKNameEntity: lazyFetch " + lazyFetch);
+        System.out.println("FKNameEntity: targetClass " + targetClass);
+        System.out.println("FKNameEntity: pkFieldName " + pkFieldName);
+        System.out.println("FKNameEntity: SQLFieldName " + SQLFieldName);
     }
 
     public FKNameEntity (String javaName, String SQLAlias, boolean lazyFetch, String targetClass, String pkFieldName, String SQLFieldName, String referencedTable) {
@@ -28,7 +35,13 @@ public class FKNameEntity {
         this.pkFieldName = pkFieldName;
         this.SQLFieldName = SQLFieldName;
         this.referencedTable = referencedTable;
+        System.out.println();
+        System.out.println("FKNameEntity: javaName " + javaName);
+        System.out.println("FKNameEntity: SQLAlias " + SQLAlias);
+        System.out.println("FKNameEntity: lazyFetch " + lazyFetch);
         System.out.println("FKNameEntity: targetClass " + targetClass);
+        System.out.println("FKNameEntity: pkFieldName " + pkFieldName);
+        System.out.println("FKNameEntity: SQLFieldName " + SQLFieldName);
         System.out.println("FKNameEntity: referencedTable " + referencedTable);
     }
 
@@ -45,12 +58,10 @@ public class FKNameEntity {
     }
 
     public String getTargetClass() {
-        System.out.println("FKNameEntity - getTargetClass: targetClass " + targetClass);
         return targetClass.substring(targetClass.lastIndexOf('.') + 1);
     }
 
     public String getReferencedTable() {
-        System.out.println("FKNameEntity - getReferencedTable: referencedTable " + referencedTable);
         if(referencedTable == null || referencedTable.isEmpty()){
             return getTargetClass();
         }
