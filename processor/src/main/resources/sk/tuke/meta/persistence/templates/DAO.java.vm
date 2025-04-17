@@ -29,7 +29,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                     "${entity.CreateQuery}");
             preparedStatement.execute();
         } catch (SQLException e) {
-            throw new PersistenceException("Cannot create $entity.Name");
+            throw new PersistenceException("Cannot create $entity.Name", e);
         }
     }
 
@@ -45,7 +45,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                 }
             }
         } catch (SQLException e) {
-            throw new PersistenceException("Cannot Select One $entity.Name");
+            throw new PersistenceException("Cannot Select One $entity.Name", e);
         }
         return Optional.empty();
     }
@@ -62,7 +62,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                 }
             }
         } catch (SQLException e) {
-            throw new PersistenceException("Cannot Select One $entity.Name");
+            throw new PersistenceException("Cannot Select One $entity.Name", e);
         }
         return instances;
     }
@@ -92,7 +92,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
         try {
             Long id = null;
             if (!checkForeignKeysExists(realObject)) {
-                throw new PersistenceException("Foreign keys doesn't exists");
+                throw new PersistenceException("Foreign keys doesn't exists: " + realObject);
             }
             if (PKExist("${entity.Name}", "${entity.PrimaryKey}", PK)) {
                 try (PreparedStatement preparedStatement = connection.prepareStatement("${entity.UpdateQuery}")) {
