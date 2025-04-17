@@ -83,4 +83,9 @@ public class FKNameEntity {
     public String getPKGetterName() {
         return "get" + pkFieldName.substring(0, 1).toUpperCase() + pkFieldName.substring(1);
     }
+
+    @Override
+    public String toString(){
+        return "FKNameEntity: javaName " + javaName + ", SQLAlias " + SQLAlias + ", lazyFetch " + lazyFetch + ", targetClass " + targetClass + ", pkFieldName " + pkFieldName + ", SQLFieldName " + SQLFieldName;
+    }
 }

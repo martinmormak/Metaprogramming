@@ -161,9 +161,11 @@ public class TableAnnotationProcessor extends AbstractProcessor {
             //System.out.println("TableAnnotationProcessor - getColumnList: columnType " + columnType);
 
             DatabaseColumn databaseColumn = new DatabaseColumn(columnType, columnName, column, referencedTableName, id!=null);
+            System.out.println("TableAnnotationProcessor - getColumnList: databaseColumn " + databaseColumn);
             databaseColumns.add(databaseColumn);
             if(isFK){
                 foreignKeyList.add(databaseColumn.getForeignKey(processingEnv));
+                System.out.println("TableAnnotationProcessor - getColumnList: foreignKeyList.get(foreignKeyList.size() - 1) " + foreignKeyList.get(foreignKeyList.size() - 1));
                 //System.out.println("TableAnnotationProcessor - getColumnList: foreignKeyList.get(foreignKeyList.size() - 1).getPKFieldName() " + foreignKeyList.get(foreignKeyList.size() - 1).getPKFieldName());
                 //System.out.println("TableAnnotationProcessor - getColumnList: foreignKeyList.get(foreignKeyList.size() - 1).getReferencedTable() " + foreignKeyList.get(foreignKeyList.size() - 1).getReferencedTable());
             }

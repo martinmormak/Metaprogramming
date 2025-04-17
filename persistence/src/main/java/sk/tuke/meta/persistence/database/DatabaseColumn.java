@@ -168,4 +168,9 @@ public class DatabaseColumn {
     public String getGetterName() {
         return "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
     }
+
+    @Override
+    public String toString(){
+        return "DatabaseColumn: type " + type + ", name " + name + ", columnName " + columnName + ", nullable " + nullable + ", unique " + unique + ", lazyFetch " + lazyFetch + ", targetClass " + targetClass + ", isPrimaryKey " + isPrimaryKey;
+    }
 }
