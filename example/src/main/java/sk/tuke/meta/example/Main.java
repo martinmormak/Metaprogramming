@@ -92,5 +92,7 @@ public class Main {
                 System.out.println("- " + personIDepartment.toString());
             }
         }
+
+        manager.delete(department);
     }
 }

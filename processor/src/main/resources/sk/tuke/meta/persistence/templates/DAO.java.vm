@@ -238,7 +238,10 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
 
         try (PreparedStatement preparedStatement = connection.prepareStatement("$entity.DeleteQuery")) {
             preparedStatement.setObject(1, PK);
-            preparedStatement.execute();
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new PersistenceException("$entity.Name with ID " + PK + " does not exist.");
+            }
         } catch (SQLException e) {
             throw new PersistenceException("Error deleting $entity.Name", e);
         }
