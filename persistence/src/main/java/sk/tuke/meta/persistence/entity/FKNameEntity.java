@@ -28,6 +28,8 @@ public class FKNameEntity {
         this.pkFieldName = pkFieldName;
         this.SQLFieldName = SQLFieldName;
         this.referencedTable = referencedTable;
+        System.out.println("FKNameEntity: targetClass " + targetClass);
+        System.out.println("FKNameEntity: referencedTable " + referencedTable);
     }
 
     public String getJavaName() {
@@ -43,10 +45,12 @@ public class FKNameEntity {
     }
 
     public String getTargetClass() {
+        System.out.println("getTargetClass: targetClass " + targetClass);
         return targetClass.substring(targetClass.lastIndexOf('.') + 1);
     }
 
     public String getReferencedTable() {
+        System.out.println("getReferencedTable: referencedTable " + referencedTable);
         if(referencedTable == null || referencedTable.isEmpty()){
             return getTargetClass();
         }

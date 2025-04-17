@@ -31,6 +31,7 @@ public class DatabaseColumn {
         this.lazyFetch = lazyFetch;
         this.targetClass = targetClass;
         this.isPrimaryKey = isPrimaryKey;
+        System.out.println("DatabaseColumn: targetClass " + targetClass);
     }
 
     public DatabaseColumn(Class<?> type, String name, boolean nullable, boolean unique,
@@ -102,9 +103,9 @@ public class DatabaseColumn {
 
         TypeElement targetClassElement = processingEnv
                 .getElementUtils()
-                .getTypeElement(getTargetClass());
+                .getTypeElement(targetClass);
 
-        System.out.println("getForeignKey: targetClass = " + getTargetClass());
+        System.out.println("getForeignKey: targetClass = " + targetClass);
 
         if (targetClassElement != null) {
             for (Element element : targetClassElement.getEnclosedElements()) {
@@ -128,7 +129,7 @@ public class DatabaseColumn {
             System.out.println("Resolved FK: referencedTableName = " + resolvedReferencedTableName);
         }
 
-        return new FKNameEntity(name, columnName, lazyFetch, getTargetClass(), pkName, SQLAlias, resolvedReferencedTableName);
+        return new FKNameEntity(name, columnName, lazyFetch, getTargetClass(), pkName, SQLAlias, referencedTableName);
     }
 
     private static String getTargetClass (Column columnAnnotation){

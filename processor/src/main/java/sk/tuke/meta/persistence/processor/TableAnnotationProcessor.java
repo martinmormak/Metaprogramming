@@ -115,8 +115,8 @@ public class TableAnnotationProcessor extends AbstractProcessor {
             String columnName = variableElement.getSimpleName().toString();
             Class<?> columnType;
 
-            System.out.println("variableElement " + variableElement);
-            System.out.println("variableElement.asType() " + variableElement.asType());
+            System.out.println("getColumnList: variableElement " + variableElement);
+            System.out.println("getColumnList: variableElement.asType() " + variableElement.asType());
             switch (variableElement.asType().toString()) {
                 case "long", "java.lang.Long":
                     columnType = long.class;
@@ -136,11 +136,15 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                 default:
                     columnType = Object.class;
                     isFK = true;
-                    TypeMirror targetTypeMirror = getTargetTypeMirror(column);
+                    TypeMirror targetTypeMirror = getTargetTypeMirror(column, variableElement);
                     if (targetTypeMirror != null) {
+                        System.out.println("getColumnList: targetTypeMirror " + targetTypeMirror);
                         Element targetElement = processingEnv.getTypeUtils().asElement(targetTypeMirror);
+                        System.out.println("getColumnList: targetElement " + targetElement);
                         if (targetElement instanceof TypeElement targetClassElement) {
+                            System.out.println("getColumnList: targetElement instanceof TypeElement true");
                             Table referencedTable = targetClassElement.getAnnotation(Table.class);
+                            System.out.println("getColumnList: referencedTable " + referencedTable);
                             if (referencedTable == null) {
                                 throw new ProcessorException("Referenced class " + targetClassElement.getSimpleName() + " is not annotated with @Table");
                             }
@@ -160,23 +164,32 @@ public class TableAnnotationProcessor extends AbstractProcessor {
             databaseColumns.add(databaseColumn);
             if(isFK){
                 foreignKeyList.add(databaseColumn.getForeignKey(processingEnv));
-                System.out.println(foreignKeyList.get(foreignKeyList.size() - 1).getPKFieldName());
+                System.out.println("getColumnList: foreignKeyList.get(foreignKeyList.size() - 1).getPKFieldName() " + foreignKeyList.get(foreignKeyList.size() - 1).getPKFieldName());
+                System.out.println("getColumnList: foreignKeyList.get(foreignKeyList.size() - 1).getReferencedTable() " + foreignKeyList.get(foreignKeyList.size() - 1).getReferencedTable());
             }
         }
     }
 
 
 
-    private TypeMirror getTargetTypeMirror(Column column) {
+    private TypeMirror getTargetTypeMirror(Column column, VariableElement field) {
         try {
-            System.out.println("getTargetTypeMirror: column" + column);
-            System.out.println("getTargetTypeMirror: column.targetClass() " + column.targetClass());
-            column.targetClass(); // This triggers MirroredTypeException
-            return null; // Won't be reached
+            // Try to access targetClass — this will throw if not yet compiled
+            Class<?> clazz = column.targetClass();
+            if (clazz == void.class) {
+                // targetClass was NOT set explicitly -> use field type
+                return field.asType();
+            }
         } catch (MirroredTypeException e) {
-            System.out.println("getTargetTypeMirror: e " + e);
-            System.out.println("getTargetTypeMirror: e.getTypeMirror() " + e.getTypeMirror());
-            return e.getTypeMirror(); // Correct way to get the TypeMirror
+            if (e.getTypeMirror().toString().equals("void")) {
+                // targetClass was void.class (default) -> use field type
+                return field.asType();
+            } else {
+                // Explicit targetClass -> use the provided TypeMirror
+                return e.getTypeMirror();
+            }
         }
+        // fallback
+        return field.asType();
     }
 }

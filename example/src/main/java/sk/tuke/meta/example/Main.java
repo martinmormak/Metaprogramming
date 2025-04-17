@@ -40,7 +40,9 @@ public class Main {
         if(onePerson.isPresent()) {
             System.out.println(onePerson.get());
             IDepartment onePersonIDepartment = onePerson.get().getIDepartment();
-            System.out.println("- " + onePersonIDepartment.toString());
+            if (onePersonIDepartment != null) {
+                System.out.println("- " + onePersonIDepartment.toString());
+            }
         }
 
         System.out.println("List All Persons");
@@ -48,7 +50,9 @@ public class Main {
         for (Person person : persons) {
             System.out.println(person);
             IDepartment personIDepartment = person.getIDepartment();
-            System.out.println("- " + personIDepartment.toString());
+            if (personIDepartment != null) {
+                System.out.println("- " + personIDepartment.toString());
+            }
         }
         Optional<Department> anotherDepartment = manager.get(Department.class, 100);
         System.out.println(anotherDepartment.isPresent());
@@ -60,7 +64,9 @@ public class Main {
         for (Person person : persons) {
             System.out.println(person);
             IDepartment personIDepartment = person.getIDepartment();
-            System.out.println("- " + personIDepartment.toString());
+            if (personIDepartment != null) {
+                System.out.println("- " + personIDepartment.toString());
+            }
         }
 
         System.out.println("Delete Department");

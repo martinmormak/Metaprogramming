@@ -4,7 +4,7 @@ import sk.tuke.meta.persistence.annotations.Column;
 import sk.tuke.meta.persistence.annotations.Id;
 import sk.tuke.meta.persistence.annotations.Table;
 
-@Table(name = "Department")
+@Table(name = "Oddelenie")
 public class Department implements IDepartment {
     @Id
     @Column

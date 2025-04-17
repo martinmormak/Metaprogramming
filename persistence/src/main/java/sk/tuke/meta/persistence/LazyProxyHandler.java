@@ -40,6 +40,10 @@ public class LazyProxyHandler<T> implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (realObject == null) {
             realObject = persistenceManager.get(targetClass, id).orElse(null); // Načítanie skutočného objektu
+            if(realObject == null) {
+                System.out.println("Cannot get object with id " + id + " from database");
+                return null;
+            }
         }
         return method.invoke(realObject, args);
     }
