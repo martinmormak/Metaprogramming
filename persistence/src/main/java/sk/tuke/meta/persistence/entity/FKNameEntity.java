@@ -5,22 +5,25 @@ import sk.tuke.meta.persistence.annotations.Table;
 public class FKNameEntity {
     private final String javaName;
     private final String SQLAlias;
+    private final boolean lazyFetch;
     private final String targetClass;
     private final String pkFieldName;
     private final String SQLFieldName;
     private String referencedTable = "";
 
-    public FKNameEntity (String javaName, String SQLAlias, String targetClass, String pkFieldName, String SQLFieldName) {
+    public FKNameEntity (String javaName, String SQLAlias, boolean lazyFetch, String targetClass, String pkFieldName, String SQLFieldName) {
         this.javaName = javaName;
         this.SQLAlias = SQLAlias;
+        this.lazyFetch = lazyFetch;
         this.targetClass = targetClass;
         this.pkFieldName = pkFieldName;
         this.SQLFieldName = SQLFieldName;
     }
 
-    public FKNameEntity (String javaName, String SQLAlias, String targetClass, String pkFieldName, String SQLFieldName, String referencedTable) {
+    public FKNameEntity (String javaName, String SQLAlias, boolean lazyFetch, String targetClass, String pkFieldName, String SQLFieldName, String referencedTable) {
         this.javaName = javaName;
         this.SQLAlias = SQLAlias;
+        this.lazyFetch = lazyFetch;
         this.targetClass = targetClass;
         this.pkFieldName = pkFieldName;
         this.SQLFieldName = SQLFieldName;
@@ -35,11 +38,18 @@ public class FKNameEntity {
         return SQLAlias;
     }
 
+    public boolean isLazyFetch() {
+        return lazyFetch;
+    }
+
     public String getTargetClass() {
         return targetClass.substring(targetClass.lastIndexOf('.') + 1);
     }
 
     public String getReferencedTable() {
+        if(referencedTable == null || referencedTable.isEmpty()){
+            return getTargetClass();
+        }
         return referencedTable;
     }
 

@@ -148,12 +148,13 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                                     ? targetClassElement.getSimpleName().toString()
                                     : referencedTable.name();
                         }
-                        System.out.println("targetTypeMirror " + targetTypeMirror);
+                        System.out.println("getColumnList: referencedTableName " + referencedTableName);
+                        System.out.println("getColumnList: targetTypeMirror " + targetTypeMirror);
                     }
                     break;
             }
 
-            System.out.println("columnType " + columnType);
+            System.out.println("getColumnList: columnType " + columnType);
 
             DatabaseColumn databaseColumn = new DatabaseColumn(columnType, columnName, column, referencedTableName, id!=null);
             databaseColumns.add(databaseColumn);
@@ -168,7 +169,8 @@ public class TableAnnotationProcessor extends AbstractProcessor {
 
     private TypeMirror getTargetTypeMirror(Column column) {
         try {
-            System.out.println("column.targetClass() " + column.targetClass());
+            System.out.println("getTargetTypeMirror: column" + column);
+            System.out.println("getTargetTypeMirror: column.targetClass() " + column.targetClass());
             column.targetClass(); // This triggers MirroredTypeException
             return null; // Won't be reached
         } catch (MirroredTypeException e) {

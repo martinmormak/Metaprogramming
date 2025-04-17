@@ -305,7 +305,9 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
 
     private boolean checkForeignKeysExists($entity.Name entity) {
         Object PK = null;
+        Object refEntity = null;
         #foreach ($fieldNameEntity in $entity.ForeignKeyList)
+            #if (${fieldNameEntity.LazyFetch})
         // TODO: this must use note entity but use field
         PK = null;
         if (Proxy.isProxyClass(entity.getClass())) {
@@ -328,6 +330,21 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
         } else {
             return false;
         }
+            #else
+        refEntity = entity.${fieldNameEntity.FieldGetterName}();
+        if (refEntity != null && refEntity instanceof ${fieldNameEntity.TargetClass}) {
+            PK = ((${fieldNameEntity.TargetClass}) refEntity).${fieldNameEntity.PKGetterName}();
+            if (PK != null) {
+                if (!PKExist("${fieldNameEntity.ReferencedTable}", "${fieldNameEntity.SQLFieldName}", PK)) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+            #end
         #end
         return true;
     }

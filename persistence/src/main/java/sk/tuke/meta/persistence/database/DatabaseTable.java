@@ -73,9 +73,9 @@ public class DatabaseTable {
             if (!columnType.isPrimitive() && !columnType.equals(Integer.class) && !columnType.equals(Float.class)
                     && !columnType.equals(Double.class) && !columnType.equals(String.class)) {
                 if(databaseColumn.isLazyFetch()) {
-                    foreignKeyList.add(new FKNameEntity(databaseColumn.getName(), databaseColumn.getSQLAlias(), databaseColumn.getTargetClass(), databaseColumn.getName(), databaseColumn.getSQLAlias()));
+                    foreignKeyList.add(new FKNameEntity(databaseColumn.getName(), databaseColumn.getSQLAlias(), databaseColumn.isLazyFetch(), databaseColumn.getTargetClass(), databaseColumn.getName(), databaseColumn.getSQLAlias()));
                 } else {
-                    foreignKeyList.add(new FKNameEntity(databaseColumn.getName(), databaseColumn.getSQLAlias(), databaseColumn.getClass().getSimpleName(), databaseColumn.getName(), databaseColumn.getSQLAlias()));
+                    foreignKeyList.add(new FKNameEntity(databaseColumn.getName(), databaseColumn.getSQLAlias(), databaseColumn.isLazyFetch(), databaseColumn.getClass().getSimpleName(), databaseColumn.getName(), databaseColumn.getSQLAlias()));
                 }
             }
         }

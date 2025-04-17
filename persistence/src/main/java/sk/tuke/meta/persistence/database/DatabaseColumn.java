@@ -81,6 +81,9 @@ public class DatabaseColumn {
     }
 
     public String getTargetClass() {
+        if(targetClass.contains("void")){
+            return name.substring(0, 1).toUpperCase() + name.substring(1);
+        }
         return targetClass.substring(targetClass.lastIndexOf('.') + 1);
     }
 
@@ -95,9 +98,13 @@ public class DatabaseColumn {
     public FKNameEntity getForeignKey(ProcessingEnvironment processingEnv) {
         String pkName = "id";
         String SQLAlias = "id";
+        String resolvedReferencedTableName = "";
+
         TypeElement targetClassElement = processingEnv
                 .getElementUtils()
-                .getTypeElement(targetClass);
+                .getTypeElement(getTargetClass());
+
+        System.out.println("getForeignKey: targetClass = " + getTargetClass());
 
         if (targetClassElement != null) {
             for (Element element : targetClassElement.getEnclosedElements()) {
@@ -109,8 +116,19 @@ public class DatabaseColumn {
                     break;
                 }
             }
+
+            Table tableAnnotation = targetClassElement.getAnnotation(Table.class);
+            if (tableAnnotation != null) {
+                resolvedReferencedTableName = tableAnnotation.name().isEmpty()
+                        ? targetClassElement.getSimpleName().toString()
+                        : tableAnnotation.name();
+            }
+
+            System.out.println("Resolved FK: targetClass = " + targetClassElement);
+            System.out.println("Resolved FK: referencedTableName = " + resolvedReferencedTableName);
         }
-        return new FKNameEntity(name, columnName, targetClass, pkName, SQLAlias, referencedTableName);
+
+        return new FKNameEntity(name, columnName, lazyFetch, getTargetClass(), pkName, SQLAlias, resolvedReferencedTableName);
     }
 
     private static String getTargetClass (Column columnAnnotation){
