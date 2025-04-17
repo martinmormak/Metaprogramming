@@ -168,9 +168,12 @@ public class TableAnnotationProcessor extends AbstractProcessor {
 
     private TypeMirror getTargetTypeMirror(Column column) {
         try {
+            System.out.println("column.targetClass() " + column.targetClass());
             column.targetClass(); // This triggers MirroredTypeException
             return null; // Won't be reached
         } catch (MirroredTypeException e) {
+            System.out.println("getTargetTypeMirror: e " + e);
+            System.out.println("getTargetTypeMirror: e.getTypeMirror() " + e.getTypeMirror());
             return e.getTypeMirror(); // Correct way to get the TypeMirror
         }
     }
