@@ -105,11 +105,11 @@ public class DatabaseColumn {
                 .getElementUtils()
                 .getTypeElement(targetClass);
 
-        System.out.println("getForeignKey: targetClass = " + targetClass);
+        System.out.println("DatabaseColumn - getForeignKey: targetClass = " + targetClass);
 
         if (targetClassElement != null) {
             for (Element element : targetClassElement.getEnclosedElements()) {
-                System.out.println("getTargetClass: element "+element);
+                System.out.println("DatabaseColumn - getTargetClass: element "+element);
                 if (element.getKind().isField() && element.getAnnotation(Id.class) != null) {
                     pkName = element.getSimpleName().toString();
                     Column column = element.getAnnotation(Column.class);
@@ -124,10 +124,10 @@ public class DatabaseColumn {
                         ? targetClassElement.getSimpleName().toString()
                         : tableAnnotation.name();
             }
-
-            System.out.println("Resolved FK: targetClass = " + targetClassElement);
-            System.out.println("Resolved FK: referencedTableName = " + resolvedReferencedTableName);
         }
+
+        System.out.println("DatabaseColumn - targetClass = " + targetClassElement);
+        System.out.println("DatabaseColumn - referencedTableName = " + resolvedReferencedTableName);
 
         return new FKNameEntity(name, columnName, lazyFetch, getTargetClass(), pkName, SQLAlias, referencedTableName);
     }
@@ -135,11 +135,11 @@ public class DatabaseColumn {
     private static String getTargetClass (Column columnAnnotation){
         TypeMirror typeMirror = null;
         try {
-            System.out.println("getTargetClass: columnAnnotation.targetClass().getSimpleName() " + columnAnnotation.targetClass().getSimpleName());
+            System.out.println("DatabaseColumn - getTargetClass: columnAnnotation.targetClass().getSimpleName() " + columnAnnotation.targetClass().getSimpleName());
             return columnAnnotation.targetClass().getSimpleName(); // This triggers MirroredTypeException
         } catch (MirroredTypeException e) {
-            System.out.println("getTargetClass: e " + e);
-            System.out.println("getTargetClass: e.getTypeMirror() " + e.getTypeMirror());
+            System.out.println("DatabaseColumn - getTargetClass: e " + e);
+            System.out.println("DatabaseColumn - getTargetClass: e.getTypeMirror() " + e.getTypeMirror());
             typeMirror = e.getTypeMirror(); // Correct way to get the TypeMirror
         }
         return typeMirror.toString();

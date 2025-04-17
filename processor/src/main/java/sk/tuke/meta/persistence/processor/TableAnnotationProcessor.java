@@ -115,8 +115,8 @@ public class TableAnnotationProcessor extends AbstractProcessor {
             String columnName = variableElement.getSimpleName().toString();
             Class<?> columnType;
 
-            System.out.println("getColumnList: variableElement " + variableElement);
-            System.out.println("getColumnList: variableElement.asType() " + variableElement.asType());
+            System.out.println("TableAnnotationProcessor - getColumnList: variableElement " + variableElement);
+            System.out.println("TableAnnotationProcessor - getColumnList: variableElement.asType() " + variableElement.asType());
             switch (variableElement.asType().toString()) {
                 case "long", "java.lang.Long":
                     columnType = long.class;
@@ -138,13 +138,13 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                     isFK = true;
                     TypeMirror targetTypeMirror = getTargetTypeMirror(column, variableElement);
                     if (targetTypeMirror != null) {
-                        System.out.println("getColumnList: targetTypeMirror " + targetTypeMirror);
+                        System.out.println("TableAnnotationProcessor - getColumnList: targetTypeMirror " + targetTypeMirror);
                         Element targetElement = processingEnv.getTypeUtils().asElement(targetTypeMirror);
-                        System.out.println("getColumnList: targetElement " + targetElement);
+                        System.out.println("TableAnnotationProcessor - getColumnList: targetElement " + targetElement);
                         if (targetElement instanceof TypeElement targetClassElement) {
-                            System.out.println("getColumnList: targetElement instanceof TypeElement true");
+                            System.out.println("TableAnnotationProcessor - getColumnList: targetElement instanceof TypeElement true");
                             Table referencedTable = targetClassElement.getAnnotation(Table.class);
-                            System.out.println("getColumnList: referencedTable " + referencedTable);
+                            System.out.println("TableAnnotationProcessor - getColumnList: referencedTable " + referencedTable);
                             if (referencedTable == null) {
                                 throw new ProcessorException("Referenced class " + targetClassElement.getSimpleName() + " is not annotated with @Table");
                             }
@@ -152,20 +152,20 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                                     ? targetClassElement.getSimpleName().toString()
                                     : referencedTable.name();
                         }
-                        System.out.println("getColumnList: referencedTableName " + referencedTableName);
-                        System.out.println("getColumnList: targetTypeMirror " + targetTypeMirror);
+                        System.out.println("TableAnnotationProcessor - getColumnList: referencedTableName " + referencedTableName);
+                        System.out.println("TableAnnotationProcessor - getColumnList: targetTypeMirror " + targetTypeMirror);
                     }
                     break;
             }
 
-            System.out.println("getColumnList: columnType " + columnType);
+            System.out.println("TableAnnotationProcessor - getColumnList: columnType " + columnType);
 
             DatabaseColumn databaseColumn = new DatabaseColumn(columnType, columnName, column, referencedTableName, id!=null);
             databaseColumns.add(databaseColumn);
             if(isFK){
                 foreignKeyList.add(databaseColumn.getForeignKey(processingEnv));
-                System.out.println("getColumnList: foreignKeyList.get(foreignKeyList.size() - 1).getPKFieldName() " + foreignKeyList.get(foreignKeyList.size() - 1).getPKFieldName());
-                System.out.println("getColumnList: foreignKeyList.get(foreignKeyList.size() - 1).getReferencedTable() " + foreignKeyList.get(foreignKeyList.size() - 1).getReferencedTable());
+                System.out.println("TableAnnotationProcessor - getColumnList: foreignKeyList.get(foreignKeyList.size() - 1).getPKFieldName() " + foreignKeyList.get(foreignKeyList.size() - 1).getPKFieldName());
+                System.out.println("TableAnnotationProcessor - getColumnList: foreignKeyList.get(foreignKeyList.size() - 1).getReferencedTable() " + foreignKeyList.get(foreignKeyList.size() - 1).getReferencedTable());
             }
         }
     }

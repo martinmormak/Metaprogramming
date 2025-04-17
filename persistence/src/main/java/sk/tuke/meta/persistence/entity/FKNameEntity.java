@@ -45,12 +45,12 @@ public class FKNameEntity {
     }
 
     public String getTargetClass() {
-        System.out.println("getTargetClass: targetClass " + targetClass);
+        System.out.println("FKNameEntity - getTargetClass: targetClass " + targetClass);
         return targetClass.substring(targetClass.lastIndexOf('.') + 1);
     }
 
     public String getReferencedTable() {
-        System.out.println("getReferencedTable: referencedTable " + referencedTable);
+        System.out.println("FKNameEntity - getReferencedTable: referencedTable " + referencedTable);
         if(referencedTable == null || referencedTable.isEmpty()){
             return getTargetClass();
         }
