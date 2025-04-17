@@ -25,6 +25,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
     @Override
     public void createTable() {
         try {
+            System.out.println("${entity.DaoName} ${entity.CreateQuery}");
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "${entity.CreateQuery}");
             preparedStatement.execute();
@@ -36,6 +37,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
     @Override
     public Optional<$entity.Name> get(long id) {
         try {
+            System.out.println("${entity.DaoName} ${entity.SelectOneQuery}");
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "${entity.SelectOneQuery}");
             preparedStatement.setLong(1, id);
@@ -54,6 +56,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
     public List<$entity.Name> getAll() {
         List<$entity.Name> instances = new ArrayList<>();
         try {
+            System.out.println("${entity.DaoName} ${entity.SelectAllQuery}");
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "${entity.SelectAllQuery}");
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -95,6 +98,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                 throw new PersistenceException("Foreign keys doesn't exists: " + realObject);
             }
             if (PKExist("${entity.Name}", "${entity.PrimaryKey}", PK)) {
+                System.out.println("${entity.DaoName} ${entity.UpdateQuery}");
                 try (PreparedStatement preparedStatement = connection.prepareStatement("${entity.UpdateQuery}")) {
                     #set($i = 1)
                     #foreach ($column in $entity.DatabaseColumnsList)
@@ -156,6 +160,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                     preparedStatement.executeUpdate();
                 }
             } else {
+                System.out.println("${entity.DaoName} ${entity.InsertQuery}");
                 try (PreparedStatement preparedStatement = connection.prepareStatement("${entity.InsertQuery}", Statement.RETURN_GENERATED_KEYS)) {
                     #set($i = 1)
                     #foreach ($column in $entity.DatabaseColumnsList)
@@ -240,6 +245,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
             PK = entity.${entity.IdColumn.GetterName}();
         }
 
+        System.out.println("${entity.DaoName} $entity.DeleteQuery");
         try (PreparedStatement preparedStatement = connection.prepareStatement("$entity.DeleteQuery")) {
             preparedStatement.setObject(1, PK);
             int affectedRows = preparedStatement.executeUpdate();
