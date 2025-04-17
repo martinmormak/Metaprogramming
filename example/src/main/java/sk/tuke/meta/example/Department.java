@@ -11,7 +11,7 @@ public class Department implements IDepartment {
     private long id;
     @Column
     private String name;
-    @Column
+    @Column (name = "Kod", unique = true, nullable = false)
     private String code;
     @Column
     private double floor;

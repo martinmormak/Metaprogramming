@@ -1,6 +1,7 @@
 package sk.tuke.meta.example;
 
 import sk.tuke.meta.persistence.GeneratedPersistenceManager;
+import sk.tuke.meta.persistence.PersistenceException;
 import sk.tuke.meta.persistence.PersistenceManager;
 import sk.tuke.meta.persistence.ReflectivePersistenceManager;
 
@@ -93,6 +94,11 @@ public class Main {
             }
         }
 
-        manager.delete(department);
+        try {
+            manager.delete(department);
+            System.err.println("Department is deleted!");
+        } catch (PersistenceException e){
+            System.out.println("Department is not saved!");
+        }
     }
 }
