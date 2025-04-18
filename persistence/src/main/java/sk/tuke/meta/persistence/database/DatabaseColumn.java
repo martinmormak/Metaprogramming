@@ -138,7 +138,7 @@ public class DatabaseColumn {
         System.out.println("DatabaseColumn - referencedTableName = " + referencedTableName);
         System.out.println("DatabaseColumn - resolvedReferencedTableName = " + resolvedReferencedTableName);
 
-        return new FKNameEntity(name, columnName, lazyFetch, getTargetClass(), pkName, SQLAlias, resolvedReferencedTableName);
+        return new FKNameEntity(name, getSQLAlias(), lazyFetch, getTargetClass(), pkName, SQLAlias, resolvedReferencedTableName);
     }
 
     private static String getTargetClass (Column columnAnnotation){
