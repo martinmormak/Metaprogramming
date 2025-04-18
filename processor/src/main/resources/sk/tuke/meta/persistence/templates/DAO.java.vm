@@ -230,12 +230,11 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
 
     @Override
     public void delete(Object obj) {
-        $entity.Name entity = ($entity.Name) obj;
         Object PK = null;
 
-        if (Proxy.isProxyClass(entity.getClass())) {
+        if (Proxy.isProxyClass(obj.getClass())) {
             System.out.println("$entity.DaoName delete: entity was proxy");
-            InvocationHandler handler = Proxy.getInvocationHandler(entity);
+            InvocationHandler handler = Proxy.getInvocationHandler(obj);
 
             if (handler instanceof LazyProxyHandler lazyHandler) {
                 System.out.println("$entity.DaoName delete: proxy is LazyProxyHandler");
@@ -244,6 +243,8 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
         }
 
         if (PK == null) {
+            // only safe to cast now — it's not a proxy
+            $entity.Name entity = ($entity.Name) obj;
             PK = entity.${entity.IdColumn.GetterName}();
         }
 
