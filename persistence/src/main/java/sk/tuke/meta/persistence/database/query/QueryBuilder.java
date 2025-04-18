@@ -57,7 +57,7 @@ public class QueryBuilder {
                 hasPrimaryKey = true;
                 query.append(" PRIMARY KEY AUTOINCREMENT");
             } else {
-                if(databaseColumn.isNullable()){
+                if(!databaseColumn.isNullable()){
                     query.append(" NOT NULL");
                 }
                 if(databaseColumn.isUnique()){
