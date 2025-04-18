@@ -122,22 +122,21 @@ public class TableAnnotationProcessor extends AbstractProcessor {
             //System.out.println("TableAnnotationProcessor - getColumnList: variableElement.asType() " + variableElement.asType());
             switch (variableElement.asType().toString()) {
                 case "long", "java.lang.Long":
-                    columnType = long.class;
+                    columnClass = "java.lang.Long";
                     break;
                 case "int", "java.lang.Integer":
-                    columnType = Integer.class;
+                    columnClass = "java.lang.Integer";
                     break;
                 case "float", "java.lang.Float":
-                    columnType = float.class;
+                    columnClass = "java.lang.Float";
                     break;
                 case "double", "java.lang.Double":
-                    columnType = double.class;
+                    columnClass = "java.lang.Double";
                     break;
                 case "string", "java.lang.String":
-                    columnType = String.class;
+                    columnClass = "java.lang.String";
                     break;
                 default:
-                    columnType = Object.class;
                     isFK = true;
                     TypeMirror targetTypeMirror = getTargetTypeMirror(column, variableElement);
                     if (targetTypeMirror != null) {

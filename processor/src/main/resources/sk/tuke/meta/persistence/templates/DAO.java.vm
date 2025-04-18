@@ -167,7 +167,9 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                         #set($shortType = $column.Type)
                         #set($columnName = $column.Name)
                         #set($methodSuffix = $columnName.substring(0, 1).toUpperCase() + $columnName.substring(1))
-                        #if ($columnName != $entity.IdColumn.Name)  ## Skip the ID column
+                        #if ($columnName != $entity.IdColumn.Name)
+                            System.out.println("$column.Name");
+                            System.out.println("$shortType");
                             #if ($shortType == "class java.lang.String" || $shortType == "String")
                     preparedStatement.setString($i, realObject.get${methodSuffix}());
                             #elseif ($shortType == "class java.lang.Long" || $shortType == "long")
@@ -296,7 +298,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
             System.out.println("$entity.DaoName getInstanceFromDatabase: column.TargetClass ${column.TargetClass}");
             System.out.println("$entity.DaoName getInstanceFromDatabase: foreignKeyId ${foreignKeyId}");
             System.out.println("$entity.DaoName getInstanceFromDatabase: daoPersistenceManager ${daoPersistenceManager}");
-            instance.set${methodSuffix}((${methodSuffix}) LazyProxyHandler.createProxy(
+            instance.set${methodSuffix}((${column.TypeString}) LazyProxyHandler.createProxy(
                 ${column.TypeString}.class,
                 ${column.TargetClass}.class,
                 foreignKeyId,
@@ -305,7 +307,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                         #else
             // Bežné načítanie cudzieho kľúča
             optionalValue = daoPersistenceManager.get(${column.TargetClass}.class, resultSet.getLong("$SQLAlias"));
-            instance.set${methodSuffix}((${methodSuffix}) optionalValue.orElse(null));
+            instance.set${methodSuffix}(($column.TypeString) optionalValue.orElse(null));
                         #end
                     #else
             instance.set${methodSuffix}(($column.TypeString) resultSet.getObject("$SQLAlias"));
