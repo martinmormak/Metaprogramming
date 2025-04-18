@@ -105,6 +105,9 @@ public class TableAnnotationProcessor extends AbstractProcessor {
 
     private void getColumnList(TypeElement classElement) {
         for (VariableElement variableElement : ElementFilter.fieldsIn(classElement.getEnclosedElements())) {
+            System.out.println("TableAnnotationProcessor - getColumnList: variableElement " + variableElement);
+            TypeMirror typeMirror = variableElement.asType();
+            String columnClass = typeMirror.toString().substring(typeMirror.toString().lastIndexOf('.') + 1);;
             boolean isFK = false;
             Column column = variableElement.getAnnotation(Column.class);
             Id id = variableElement.getAnnotation(Id.class);
@@ -160,7 +163,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
 
             //System.out.println("TableAnnotationProcessor - getColumnList: columnType " + columnType);
 
-            DatabaseColumn databaseColumn = new DatabaseColumn(columnType, columnName, column, referencedTableName, id!=null);
+            DatabaseColumn databaseColumn = new DatabaseColumn(columnClass, columnName, column, referencedTableName, id!=null);
             System.out.println("TableAnnotationProcessor - getColumnList: databaseColumn " + databaseColumn);
             databaseColumns.add(databaseColumn);
             if(isFK){

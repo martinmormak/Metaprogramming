@@ -297,7 +297,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
             System.out.println("$entity.DaoName getInstanceFromDatabase: foreignKeyId ${foreignKeyId}");
             System.out.println("$entity.DaoName getInstanceFromDatabase: daoPersistenceManager ${daoPersistenceManager}");
             instance.set${methodSuffix}((${methodSuffix}) LazyProxyHandler.createProxy(
-                ${methodSuffix}.class,
+                ${column.TypeString}.class,
                 ${column.TargetClass}.class,
                 foreignKeyId,
                 daoPersistenceManager
@@ -308,7 +308,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
             instance.set${methodSuffix}((${methodSuffix}) optionalValue.orElse(null));
                         #end
                     #else
-            instance.set${methodSuffix}((${methodSuffix}) resultSet.getObject("$SQLAlias"));
+            instance.set${methodSuffix}(($column.TypeString) resultSet.getObject("$SQLAlias"));
                     #end
                 #end
             #end

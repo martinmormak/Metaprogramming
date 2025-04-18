@@ -16,7 +16,7 @@ public class Person {
     @Column
     private int age;
     @Column(name = "Department", lazyFetch = true, targetClass = Department.class)
-    private IDepartment iDepartment;
+    private IDepartment department;
 
     public Person() {
     }
@@ -60,11 +60,19 @@ public class Person {
     }
 
     public IDepartment getIDepartment() {
-        return iDepartment;
+        return department;
+    }
+
+    public IDepartment getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(IDepartment iDepartment) {
+        this.department = iDepartment;
     }
 
     public void setIDepartment(IDepartment iDepartment) {
-        this.iDepartment = iDepartment;
+        this.department = iDepartment;
     }
 
     @Override

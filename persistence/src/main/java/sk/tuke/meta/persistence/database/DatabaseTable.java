@@ -109,7 +109,7 @@ public class DatabaseTable {
     }
 
     public DatabaseColumn getIdColumn() {
-        return new DatabaseColumn(Integer.class ,"id", "id", true, false, true);
+        return new DatabaseColumn("Integer" ,"id", "id", true, false, true);
     }
 
     public String getFullName() {

@@ -93,7 +93,7 @@ public class TableProcessor extends AbstractProcessor {
                                 break;
                         }
 
-                        DatabaseColumn databaseColumn = new DatabaseColumn(columnType, columnName, column, referencedTableName, id!=null);
+                        DatabaseColumn databaseColumn = new DatabaseColumn(columnType.getSimpleName(), columnName, column, referencedTableName, id!=null);
                         databaseColumns.add(databaseColumn);
                         if(isFK){
                             foreignKeyList.add(databaseColumn.getForeignKey(processingEnv));

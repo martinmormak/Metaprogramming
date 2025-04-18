@@ -70,7 +70,7 @@ public class Main {
             }
         }
 
-        /*System.out.println("Delete Department");
+        System.out.println("Delete Department");
         manager.delete(department);
 
         persons = manager.getAll(Person.class);
@@ -99,6 +99,6 @@ public class Main {
             System.err.println("Department is deleted!");
         } catch (PersistenceException e){
             System.out.println("Department is not saved!");
-        }*/
+        }
     }
 }

@@ -12,7 +12,7 @@ import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 
 public class DatabaseColumn {
-    private final Class<?> type;
+    private final String type;
     private final String name;
     private final String columnName;
     private final boolean nullable;
@@ -21,7 +21,7 @@ public class DatabaseColumn {
     private final String targetClass;
     private String referencedTableName = "";
     private final boolean isPrimaryKey;
-    public DatabaseColumn(Class<?> type, String name, String columnName, boolean nullable, boolean unique,
+    public DatabaseColumn(String type, String name, String columnName, boolean nullable, boolean unique,
                           boolean lazyFetch, String targetClass, boolean isPrimaryKey) {
         this.type = type;
         this.name = name;
@@ -42,34 +42,41 @@ public class DatabaseColumn {
         System.out.println("DatabaseColumn: isPrimaryKey " + isPrimaryKey);
     }
 
-    public DatabaseColumn(Class<?> type, String name, boolean nullable, boolean unique,
+    public DatabaseColumn(String type, String name, boolean nullable, boolean unique,
                           boolean lazyFetch, String targetClass, boolean isPrimaryKey) {
         this(type, name, name, nullable, unique, lazyFetch, targetClass, isPrimaryKey);
     }
 
 
-    public DatabaseColumn(Class<?> type, String name, String columnName, boolean nullable, boolean unique, boolean isPrimaryKey) {
+    public DatabaseColumn(String type, String name, String columnName, boolean nullable, boolean unique, boolean isPrimaryKey) {
         this(type, name, columnName, nullable, unique, false, "void", isPrimaryKey);
     }
 
-    public DatabaseColumn(Class<?> type, String name, boolean nullable, boolean unique, boolean isPrimaryKey) {
+    public DatabaseColumn(String type, String name, boolean nullable, boolean unique, boolean isPrimaryKey) {
         this(type, name, name, nullable, unique, false, "void", isPrimaryKey);
     }
 
-    public DatabaseColumn(Class<?> type, String name, Column columnAnnotation, boolean isPrimaryKey) {
+    public DatabaseColumn(String type, String name, Column columnAnnotation, boolean isPrimaryKey) {
         this(type, name, columnAnnotation.name(), columnAnnotation.nullable(), columnAnnotation.unique(), columnAnnotation.lazyFetch(), getTargetClass(columnAnnotation), isPrimaryKey);
     }
 
-    public DatabaseColumn(Class<?> type, String name, Column columnAnnotation, String referencedTableName, boolean isPrimaryKey) {
+    public DatabaseColumn(String type, String name, Column columnAnnotation, String referencedTableName, boolean isPrimaryKey) {
         this(type, name, columnAnnotation.name(), columnAnnotation.nullable(), columnAnnotation.unique(), columnAnnotation.lazyFetch(), getTargetClass(columnAnnotation), isPrimaryKey);
         this.referencedTableName = referencedTableName;
         System.out.println("DatabaseColumn: referencedTableName " + referencedTableName);
     }
 
     public Class<?> getType() {
-        return type;
+        try {
+            return Class.forName(type);
+        } catch (ClassNotFoundException e) {
+            return Object.class;
+        }
     }
 
+    public String getTypeString() {
+        return type;
+    }
     public String getName() {
         return name;
     }
