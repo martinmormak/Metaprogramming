@@ -9,7 +9,7 @@ public class FKNameEntity {
     private final String targetClass;
     private final String pkFieldName;
     private final String SQLFieldName;
-    private String referencedTable = "";
+    private final String referencedTable;
 
     public FKNameEntity (String javaName, String SQLAlias, boolean lazyFetch, String targetClass, String pkFieldName, String SQLFieldName) {
         this.javaName = javaName;
@@ -18,6 +18,7 @@ public class FKNameEntity {
         this.targetClass = targetClass;
         this.pkFieldName = pkFieldName;
         this.SQLFieldName = SQLFieldName;
+        this.referencedTable = "";
         System.out.println();
         System.out.println("FKNameEntity: javaName " + javaName);
         System.out.println("FKNameEntity: SQLAlias " + SQLAlias);
@@ -25,6 +26,7 @@ public class FKNameEntity {
         System.out.println("FKNameEntity: targetClass " + targetClass);
         System.out.println("FKNameEntity: pkFieldName " + pkFieldName);
         System.out.println("FKNameEntity: SQLFieldName " + SQLFieldName);
+        System.out.println("FKNameEntity: referencedTable " + referencedTable);
     }
 
     public FKNameEntity (String javaName, String SQLAlias, boolean lazyFetch, String targetClass, String pkFieldName, String SQLFieldName, String referencedTable) {

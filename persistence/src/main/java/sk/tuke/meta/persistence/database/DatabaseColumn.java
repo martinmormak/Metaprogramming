@@ -91,6 +91,8 @@ public class DatabaseColumn {
     }
 
     public String getTargetClass() {
+        System.out.println("DatabaseColumn: getTargetClass: name " + name);
+        System.out.println("DatabaseColumn: getTargetClass: targetClass " + targetClass);
         if(targetClass.contains("void")){
             return name.substring(0, 1).toUpperCase() + name.substring(1);
         }
@@ -106,6 +108,16 @@ public class DatabaseColumn {
     }
 
     public FKNameEntity getForeignKey(ProcessingEnvironment processingEnv) {
+        System.out.println();
+        System.out.println("DatabaseColumn - getForeignKey: type " + type);
+        System.out.println("DatabaseColumn - getForeignKey: name " + name);
+        System.out.println("DatabaseColumn - getForeignKey: columnName " + columnName);
+        System.out.println("DatabaseColumn - getForeignKey: nullable " + nullable);
+        System.out.println("DatabaseColumn - getForeignKey: unique " + unique);
+        System.out.println("DatabaseColumn - getForeignKey: lazyFetch " + lazyFetch);
+        System.out.println("DatabaseColumn - getForeignKey: targetClass " + targetClass);
+        System.out.println("DatabaseColumn - getForeignKey: isPrimaryKey " + isPrimaryKey);
+
         String pkName = "id";
         String SQLAlias = "id";
         String resolvedReferencedTableName = "";
