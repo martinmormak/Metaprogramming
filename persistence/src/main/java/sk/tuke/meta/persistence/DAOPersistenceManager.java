@@ -1,5 +1,7 @@
 package sk.tuke.meta.persistence;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,11 +52,24 @@ public abstract class DAOPersistenceManager implements PersistenceManager {
     @Override
     public void save(Object entity) {
         // TODO: What if we would receive a Proxy?
-        getDAO(entity.getClass()).save(entity);
+        Class<?> entityClass = resolveRealClass(entity);
+        getDAO(entityClass).save(entity);
     }
 
     @Override
     public void delete(Object entity) {
-        getDAO((entity.getClass())).delete(entity);
+        Class<?> entityClass = resolveRealClass(entity);
+        getDAO(entityClass).delete(entity);
+    }
+
+    private Class<?> resolveRealClass(Object entity) {
+        Class<?> entityClass = entity.getClass();
+        if (Proxy.isProxyClass(entityClass)) {
+            InvocationHandler handler = Proxy.getInvocationHandler(entity);
+            if (handler instanceof LazyProxyHandler lazyHandler) {
+                return lazyHandler.getTargetClass(); // <-- You must add this method
+            }
+        }
+        return entityClass;
     }
 }
