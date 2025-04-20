@@ -1,17 +1,49 @@
 package sk.tuke.meta.persistence;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 #foreach($entity in $entities)
 import $entity.FullName;
 import $entity.FullDaoName;
 #end
 
-public class GeneratedPersistenceManager extends DAOPersistenceManager {
+public class GeneratedPersistenceManager extends DAOPersistenceManager implements TransactionalPersistenceManager {
     public GeneratedPersistenceManager(Connection connection) {
         super(connection);
         #foreach($entity in $entities)
         putDAO(${entity.Name}.class, new ${entity.DaoName}(this));
         #end
+    }
+
+
+
+    @Override
+    public void beginTransaction() {
+        try {
+            getConnection().setAutoCommit(false);
+        } catch (SQLException e) {
+            throw new PersistenceException("Could not begin transaction", e);
+        }
+    }
+
+    @Override
+    public void commitTransaction() {
+        try {
+            getConnection().commit();
+            getConnection().setAutoCommit(true);
+        } catch (SQLException e) {
+            throw new PersistenceException("Could not commit transaction", e);
+        }
+    }
+
+    @Override
+    public void rollbackTransaction() {
+        try {
+            getConnection().rollback();
+            getConnection().setAutoCommit(true);
+        } catch (SQLException e) {
+            throw new PersistenceException("Could not rollback transaction", e);
+        }
     }
 }

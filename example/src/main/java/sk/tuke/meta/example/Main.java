@@ -22,6 +22,15 @@ public class Main {
 
         exampleOperations(manager);
 
+        System.out.println("---");
+        UserService service = new UserService(manager);
+        try {
+            service.transactionalSave();
+        } catch (Exception e) {
+            System.out.println("Caught expected exception: " + e.getMessage());
+        }
+
+
         conn.close();
     }
 

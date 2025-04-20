@@ -3,3 +3,5 @@ include("example")
 include("persistence")
 include("annotations")
 include("processor")
+
+include("aspects")
