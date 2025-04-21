@@ -11,7 +11,7 @@ public class TransactionAspect {
     @Pointcut("execution(sk.tuke.meta.persistence.PersistenceManager+.new(..))")
     public void transactionalManagerCreated() {}
 
-    @After("execution(sk.tuke.meta.persistence.PersistenceManager.new(..)) && this(manager)")
+    @After("execution(*.new(..)) && this(manager) && target(sk.tuke.meta.persistence.PersistenceManager)")
     public void capturePersistenceManager(PersistenceManager manager) {
         System.out.println("✅ Captured PersistenceManager instance");
         txManager = manager;
