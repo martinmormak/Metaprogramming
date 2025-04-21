@@ -1,18 +1,18 @@
 package sk.tuke.meta.persistence.aspects;
 
 import org.aspectj.lang.annotation.*;
-import sk.tuke.meta.persistence.TransactionalPersistenceManager;
+import sk.tuke.meta.persistence.PersistenceManager;
 
 @Aspect
 public class TransactionAspect {
 
-    private static TransactionalPersistenceManager txManager;
+    private static PersistenceManager txManager;
 
-    @Pointcut("execution(sk.tuke.meta.persistence.TransactionalPersistenceManager+.new(..))")
+    @Pointcut("execution(sk.tuke.meta.persistence.PersistenceManager+.new(..))")
     public void transactionalManagerCreated() {}
 
-    @After("execution(sk.tuke.meta.persistence.GeneratedPersistenceManager.new(..)) && this(manager)")
-    public void capturePersistenceManager(TransactionalPersistenceManager manager) {
+    @After("execution(sk.tuke.meta.persistence.PersistenceManager.new(..)) && this(manager)")
+    public void capturePersistenceManager(PersistenceManager manager) {
         System.out.println("✅ Captured PersistenceManager instance");
         txManager = manager;
     }

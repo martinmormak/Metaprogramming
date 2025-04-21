@@ -8,15 +8,13 @@ import $entity.FullName;
 import $entity.FullDaoName;
 #end
 
-public class GeneratedPersistenceManager extends DAOPersistenceManager implements TransactionalPersistenceManager {
+public class GeneratedPersistenceManager extends DAOPersistenceManager {
     public GeneratedPersistenceManager(Connection connection) {
         super(connection);
         #foreach($entity in $entities)
         putDAO(${entity.Name}.class, new ${entity.DaoName}(this));
         #end
     }
-
-
 
     @Override
     public void beginTransaction() {

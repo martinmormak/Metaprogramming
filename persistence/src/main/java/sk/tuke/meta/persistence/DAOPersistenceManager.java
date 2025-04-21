@@ -27,6 +27,7 @@ public abstract class DAOPersistenceManager implements PersistenceManager {
         daos.put(type, dao);
     }
 
+    @Override
     public Connection getConnection() {
         return connection;
     }

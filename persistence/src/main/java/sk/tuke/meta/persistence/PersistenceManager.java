@@ -1,5 +1,6 @@
 package sk.tuke.meta.persistence;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,13 +8,12 @@ import java.util.Optional;
  * PersistenceManager allows to persist a set of entities into a database.
  * <p>
  * All methods of the interface may throw
- * {@link sk.tuke.meta.persistence.PersistenceException}.
+ * {@link PersistenceException}.
  * <p>
  * Implementations of this interface requireс database connection
  * as а constructor argument.
  */
 public interface PersistenceManager {
-
     /**
      * Create database tables for specified entity classes
      * or all entity classes in the project.
@@ -55,4 +55,10 @@ public interface PersistenceManager {
      * @param entity the entity to be deleted
      */
     void delete(Object entity);
+
+    Connection getConnection();
+    
+    void beginTransaction();
+    void commitTransaction();
+    void rollbackTransaction();
 }

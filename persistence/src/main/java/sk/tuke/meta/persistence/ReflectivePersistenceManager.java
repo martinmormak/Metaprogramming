@@ -266,19 +266,38 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         }
     }
 
-    /*public static String getEntityDetails(Object entity) {
-        StringBuilder sb = new StringBuilder(entity.getClass().getSimpleName() + " { ");
-        sb.append("My debug output getEntityDetails:").append(entity);
-        for (Field field : entity.getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            try {
-                sb.append(field.getName()).append("-").append(field.getType()).append("=").append(field.get(entity)).append(", ");
-            } catch (IllegalAccessException e) {
-                sb.append(field.getName()).append("=ACCESS DENIED, ");
-            }
+    @Override
+    public Connection getConnection() {
+        return connection;
+    }
+
+    @Override
+    public void beginTransaction() {
+        try {
+            getConnection().setAutoCommit(false);
+        } catch (SQLException e) {
+            throw new PersistenceException("Could not begin transaction", e);
         }
-        sb.append("}");
-        return sb.toString();
-    }*/
+    }
+
+    @Override
+    public void commitTransaction() {
+        try {
+            getConnection().commit();
+            getConnection().setAutoCommit(true);
+        } catch (SQLException e) {
+            throw new PersistenceException("Could not commit transaction", e);
+        }
+    }
+
+    @Override
+    public void rollbackTransaction() {
+        try {
+            getConnection().rollback();
+            getConnection().setAutoCommit(true);
+        } catch (SQLException e) {
+            throw new PersistenceException("Could not rollback transaction", e);
+        }
+    }
 
 }
