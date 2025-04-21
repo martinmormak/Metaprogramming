@@ -13,9 +13,6 @@ import sk.tuke.meta.persistence.entity.FKNameEntity;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
@@ -24,7 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.*;
+import java.util.stream.Collectors;
 
 @SupportedAnnotationTypes("sk.tuke.meta.persistence.annotations.Table")
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
@@ -53,7 +51,8 @@ public class TableAnnotationProcessor extends AbstractProcessor {
 
                 // Print class name (fully qualified)
                 String className = processingEnv.getElementUtils().getBinaryName(classElement).toString();
-                System.out.println("Class: " + className);
+                String SQLAlias = element.getAnnotation(Table.class).name();
+                System.out.println("Class: " + className + ", SQLAlias: " + SQLAlias);
 
                 // Print all fields
                 for (Element enclosed : classElement.getEnclosedElements()) {
@@ -61,8 +60,25 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                         VariableElement field = (VariableElement) enclosed;
                         String fieldName = field.getSimpleName().toString();
                         String fieldType = field.asType().toString();
+                        SQLAlias = enclosed.getAnnotation(Column.class).name();
 
-                        System.out.println("  Field: " + fieldType + " " + fieldName);
+                        System.out.println("  Field: " + fieldType + " " + fieldName + ", " + SQLAlias);
+                    }
+                }
+
+                // Methods
+                for (Element enclosed : classElement.getEnclosedElements()) {
+                    if (enclosed.getKind() == ElementKind.METHOD) {
+                        ExecutableElement method = (ExecutableElement) enclosed;
+                        String methodName = method.getSimpleName().toString();
+                        String returnType = method.getReturnType().toString();
+
+                        List<? extends VariableElement> parameters = method.getParameters();
+                        String paramList = parameters.stream()
+                                .map(p -> p.asType().toString() + " " + p.getSimpleName())
+                                .collect(Collectors.joining(", "));
+
+                        System.out.println("  Method: " + returnType + " " + methodName + "(" + paramList + ")");
                     }
                 }
             }
