@@ -31,7 +31,7 @@ public class DatabaseColumn {
         this.lazyFetch = lazyFetch;
         this.targetClass = targetClass;
         this.isPrimaryKey = isPrimaryKey;
-        System.out.println();
+        /*System.out.println();
         System.out.println("DatabaseColumn: type " + type);
         System.out.println("DatabaseColumn: name " + name);
         System.out.println("DatabaseColumn: columnName " + columnName);
@@ -39,7 +39,7 @@ public class DatabaseColumn {
         System.out.println("DatabaseColumn: unique " + unique);
         System.out.println("DatabaseColumn: lazyFetch " + lazyFetch);
         System.out.println("DatabaseColumn: targetClass " + targetClass);
-        System.out.println("DatabaseColumn: isPrimaryKey " + isPrimaryKey);
+        System.out.println("DatabaseColumn: isPrimaryKey " + isPrimaryKey);*/
     }
 
     public DatabaseColumn(String type, String name, boolean nullable, boolean unique,

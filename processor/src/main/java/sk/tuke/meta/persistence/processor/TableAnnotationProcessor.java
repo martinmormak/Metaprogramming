@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.lang.model.element.ElementKind;
+
 @SupportedAnnotationTypes("sk.tuke.meta.persistence.annotations.Table")
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
 public class TableAnnotationProcessor extends AbstractProcessor {
@@ -45,6 +47,26 @@ public class TableAnnotationProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnvironment) {
+        for (Element element : roundEnvironment.getElementsAnnotatedWith(Table.class)) {
+            if (element.getKind() == ElementKind.CLASS) {
+                TypeElement classElement = (TypeElement) element;
+
+                // Print class name (fully qualified)
+                String className = processingEnv.getElementUtils().getBinaryName(classElement).toString();
+                System.out.println("Class: " + className);
+
+                // Print all fields
+                for (Element enclosed : classElement.getEnclosedElements()) {
+                    if (enclosed.getKind() == ElementKind.FIELD) {
+                        VariableElement field = (VariableElement) enclosed;
+                        String fieldName = field.getSimpleName().toString();
+                        String fieldType = field.asType().toString();
+
+                        System.out.println("  Field: " + fieldType + " " + fieldName);
+                    }
+                }
+            }
+        }
         var tableElements = roundEnvironment.getElementsAnnotatedWith(Table.class);
         List<DatabaseTable> entities = analyzeEntities(tableElements);
         for (var entity : entities) {
