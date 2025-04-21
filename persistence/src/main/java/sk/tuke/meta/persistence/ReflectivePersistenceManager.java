@@ -276,7 +276,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
         try {
             getConnection().setAutoCommit(false);
         } catch (SQLException e) {
-            throw new PersistenceException("Could not begin transaction", e);
+            System.out.println("Could not begin transaction" + e);
         }
     }
 
@@ -286,7 +286,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
             getConnection().commit();
             getConnection().setAutoCommit(true);
         } catch (SQLException e) {
-            throw new PersistenceException("Could not commit transaction", e);
+            System.out.println("Could not commit transaction" + e);
         }
     }
 
@@ -296,7 +296,7 @@ public class ReflectivePersistenceManager implements PersistenceManager {
             getConnection().rollback();
             getConnection().setAutoCommit(true);
         } catch (SQLException e) {
-            throw new PersistenceException("Could not rollback transaction", e);
+            System.out.println("Could not rollback transaction" + e);
         }
     }
 
