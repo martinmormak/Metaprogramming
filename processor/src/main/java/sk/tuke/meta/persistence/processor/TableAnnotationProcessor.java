@@ -60,7 +60,11 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                         VariableElement field = (VariableElement) enclosed;
                         String fieldName = field.getSimpleName().toString();
                         String fieldType = field.asType().toString();
-                        SQLAlias = enclosed.getAnnotation(Column.class).name();
+                        try {
+                            SQLAlias = enclosed.getAnnotation(Column.class).name();
+                        } catch (NullPointerException e) {
+                            SQLAlias = "";
+                        }
 
                         System.out.println("  Field: " + fieldType + " " + fieldName + ", " + SQLAlias);
                     }
