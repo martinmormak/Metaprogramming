@@ -60,13 +60,17 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                         VariableElement field = (VariableElement) enclosed;
                         String fieldName = field.getSimpleName().toString();
                         String fieldType = field.asType().toString();
+                        boolean isPrimaryKey = false;
                         try {
                             SQLAlias = enclosed.getAnnotation(Column.class).name();
                         } catch (NullPointerException e) {
                             SQLAlias = "";
                         }
+                        if(enclosed.getAnnotation(Id.class) == null){
+                            isPrimaryKey = true;
+                        }
 
-                        System.out.println("  Field: " + fieldType + " " + fieldName + ", " + SQLAlias);
+                        System.out.println("  Field: " + fieldType + " " + fieldName + ", " + SQLAlias + ", " + isPrimaryKey);
                     }
                 }
 
@@ -147,7 +151,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
 
     private void getColumnList(TypeElement classElement) {
         for (VariableElement variableElement : ElementFilter.fieldsIn(classElement.getEnclosedElements())) {
-            System.out.println("TableAnnotationProcessor - getColumnList: variableElement " + variableElement);
+            //System.out.println("TableAnnotationProcessor - getColumnList: variableElement " + variableElement);
             TypeMirror typeMirror = variableElement.asType();
             String columnClass = typeMirror.toString().substring(typeMirror.toString().lastIndexOf('.') + 1);;
             boolean isFK = false;
@@ -205,13 +209,10 @@ public class TableAnnotationProcessor extends AbstractProcessor {
             //System.out.println("TableAnnotationProcessor - getColumnList: columnType " + columnType);
 
             DatabaseColumn databaseColumn = new DatabaseColumn(columnClass, columnName, column, referencedTableName, id!=null);
-            System.out.println("TableAnnotationProcessor - getColumnList: databaseColumn " + databaseColumn);
+            //System.out.println("TableAnnotationProcessor - getColumnList: databaseColumn " + databaseColumn);
             databaseColumns.add(databaseColumn);
             if(isFK){
                 foreignKeyList.add(databaseColumn.getForeignKey(processingEnv));
-                System.out.println("TableAnnotationProcessor - getColumnList: foreignKeyList.get(foreignKeyList.size() - 1) " + foreignKeyList.get(foreignKeyList.size() - 1));
-                //System.out.println("TableAnnotationProcessor - getColumnList: foreignKeyList.get(foreignKeyList.size() - 1).getPKFieldName() " + foreignKeyList.get(foreignKeyList.size() - 1).getPKFieldName());
-                //System.out.println("TableAnnotationProcessor - getColumnList: foreignKeyList.get(foreignKeyList.size() - 1).getReferencedTable() " + foreignKeyList.get(foreignKeyList.size() - 1).getReferencedTable());
             }
         }
     }

@@ -63,7 +63,18 @@ public class DatabaseColumn {
     public DatabaseColumn(String type, String name, Column columnAnnotation, String referencedTableName, boolean isPrimaryKey) {
         this(type, name, columnAnnotation.name(), columnAnnotation.nullable(), columnAnnotation.unique(), columnAnnotation.lazyFetch(), getTargetClass(columnAnnotation), isPrimaryKey);
         this.referencedTableName = referencedTableName;
-        System.out.println("DatabaseColumn: referencedTableName " + referencedTableName);
+        if(referencedTableName != null && !referencedTableName.isEmpty()) {
+            System.out.println();
+            System.out.println("DatabaseColumn: type " + type);
+            System.out.println("DatabaseColumn: name " + name);
+            System.out.println("DatabaseColumn: columnName " + columnName);
+            System.out.println("DatabaseColumn: nullable " + nullable);
+            System.out.println("DatabaseColumn: unique " + unique);
+            System.out.println("DatabaseColumn: lazyFetch " + lazyFetch);
+            System.out.println("DatabaseColumn: targetClass " + targetClass);
+            System.out.println("DatabaseColumn: isPrimaryKey " + isPrimaryKey);
+            System.out.println("DatabaseColumn: referencedTableName " + referencedTableName);
+        }
     }
 
     public Class<?> getType() {
@@ -98,8 +109,6 @@ public class DatabaseColumn {
     }
 
     public String getTargetClass() {
-        System.out.println("DatabaseColumn: getTargetClass: name " + name);
-        System.out.println("DatabaseColumn: getTargetClass: targetClass " + targetClass);
         if(targetClass.contains("void")){
             return name.substring(0, 1).toUpperCase() + name.substring(1);
         }
@@ -115,7 +124,7 @@ public class DatabaseColumn {
     }
 
     public FKNameEntity getForeignKey(ProcessingEnvironment processingEnv) {
-        System.out.println();
+        /*System.out.println();
         System.out.println("DatabaseColumn - getForeignKey: type " + type);
         System.out.println("DatabaseColumn - getForeignKey: name " + name);
         System.out.println("DatabaseColumn - getForeignKey: columnName " + columnName);
@@ -123,7 +132,7 @@ public class DatabaseColumn {
         System.out.println("DatabaseColumn - getForeignKey: unique " + unique);
         System.out.println("DatabaseColumn - getForeignKey: lazyFetch " + lazyFetch);
         System.out.println("DatabaseColumn - getForeignKey: targetClass " + targetClass);
-        System.out.println("DatabaseColumn - getForeignKey: isPrimaryKey " + isPrimaryKey);
+        System.out.println("DatabaseColumn - getForeignKey: isPrimaryKey " + isPrimaryKey);*/
 
         String pkName = "id";
         String SQLAlias = "id";

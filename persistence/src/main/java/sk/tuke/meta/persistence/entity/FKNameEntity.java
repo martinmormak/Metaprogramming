@@ -37,14 +37,14 @@ public class FKNameEntity {
         this.pkFieldName = pkFieldName;
         this.SQLFieldName = SQLFieldName;
         this.referencedTable = referencedTable;
-        System.out.println();
+        /*System.out.println();
         System.out.println("FKNameEntity: javaName " + javaName);
         System.out.println("FKNameEntity: SQLAlias " + SQLAlias);
         System.out.println("FKNameEntity: lazyFetch " + lazyFetch);
         System.out.println("FKNameEntity: targetClass " + targetClass);
         System.out.println("FKNameEntity: pkFieldName " + pkFieldName);
         System.out.println("FKNameEntity: SQLFieldName " + SQLFieldName);
-        System.out.println("FKNameEntity: referencedTable " + referencedTable);
+        System.out.println("FKNameEntity: referencedTable " + referencedTable);*/
     }
 
     public String getJavaName() {

@@ -295,10 +295,10 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                         #if (${lazyFetch})
             // Vytvorenie proxy na oneskorené načítanie
             foreignKeyId = resultSet.getLong("$SQLAlias");
-            System.out.println("$entity.DaoName getInstanceFromDatabase: methodSuffix ${methodSuffix}");
+            /*System.out.println("$entity.DaoName getInstanceFromDatabase: methodSuffix ${methodSuffix}");
             System.out.println("$entity.DaoName getInstanceFromDatabase: column.TargetClass ${column.TargetClass}");
             System.out.println("$entity.DaoName getInstanceFromDatabase: foreignKeyId ${foreignKeyId}");
-            System.out.println("$entity.DaoName getInstanceFromDatabase: daoPersistenceManager ${daoPersistenceManager}");
+            System.out.println("$entity.DaoName getInstanceFromDatabase: daoPersistenceManager ${daoPersistenceManager}");*/
             instance.set${methodSuffix}((${column.TypeString}) LazyProxyHandler.createProxy(
                 ${column.TypeString}.class,
                 ${column.TargetClass}.class,
