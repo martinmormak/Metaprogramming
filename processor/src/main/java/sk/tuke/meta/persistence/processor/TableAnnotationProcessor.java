@@ -24,6 +24,8 @@ import java.util.Set;
 import javax.lang.model.element.*;
 import java.util.stream.Collectors;
 
+import static sk.tuke.meta.persistence.database.DatabaseColumn.getTargetClass;
+
 @SupportedAnnotationTypes("sk.tuke.meta.persistence.annotations.Table")
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
 public class TableAnnotationProcessor extends AbstractProcessor {
@@ -64,8 +66,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                         try {
                             SQLAlias = enclosed.getAnnotation(Column.class).name();
                         } catch (NullPointerException e) {
-                            SQLAlias = "-12345" +
-                                    "";
+                            SQLAlias = "-12345";
                         }
                         if(enclosed.getAnnotation(Id.class) == null){
                             isPrimaryKey = true;
@@ -112,7 +113,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
             String packageName = element.getEnclosingElement().toString();
             databaseColumns = new ArrayList<>();
             foreignKeyList = new ArrayList<>();
-            getColumnList((TypeElement) element);
+            getColumnList((TypeElement) element, packageName);
             entities.add(new DatabaseTable(name, SQLAlias, packageName, databaseColumns, foreignKeyList, false));
         }
         return entities;
@@ -150,7 +151,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
         }
     }
 
-    private void getColumnList(TypeElement classElement) {
+    private void getColumnList(TypeElement classElement, String packageName) {
         for (VariableElement variableElement : ElementFilter.fieldsIn(classElement.getEnclosedElements())) {
             //System.out.println("TableAnnotationProcessor - getColumnList: variableElement " + variableElement);
             TypeMirror typeMirror = variableElement.asType();
@@ -209,11 +210,12 @@ public class TableAnnotationProcessor extends AbstractProcessor {
 
             //System.out.println("TableAnnotationProcessor - getColumnList: columnType " + columnType);
 
-            DatabaseColumn databaseColumn = new DatabaseColumn(columnClass, columnName, column, referencedTableName, id!=null);
+            DatabaseColumn databaseColumn = new DatabaseColumn(columnClass, packageName, columnName, column, referencedTableName, id!=null);
             //System.out.println("TableAnnotationProcessor - getColumnList: databaseColumn " + databaseColumn);
             databaseColumns.add(databaseColumn);
             if(isFK){
                 foreignKeyList.add(databaseColumn.getForeignKey(processingEnv));
+                System.out.println("TableAnnotationProcessor - getColumnList: foreignKeyList " + foreignKeyList.get(foreignKeyList.size()-1).toString());
             }
         }
     }

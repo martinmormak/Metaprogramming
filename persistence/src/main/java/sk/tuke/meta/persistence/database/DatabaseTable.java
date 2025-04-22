@@ -109,7 +109,12 @@ public class DatabaseTable {
     }
 
     public DatabaseColumn getIdColumn() {
-        return new DatabaseColumn("Integer" ,"id", "id", true, false, true);
+        for(DatabaseColumn databaseColumn : databaseColumnsList){
+            if(databaseColumn.isPrimaryKey()){
+                return databaseColumn;
+            }
+        }
+        throw new PersistenceException("Primary keys doesn't exists");
     }
 
     public String getFullName() {
@@ -185,5 +190,10 @@ public class DatabaseTable {
 
     private String SQLReplacer (String sql) {
         return sql.replace("\"","\\\"").replace("\n","\" + \n\"");
+    }
+
+    @Override
+    public String toString() {
+        return "DatabaseTable: name " + name + ", SQLAlias " + SQLAlias + ", packageName " + packageName + ", databaseColumnsList " + databaseColumnsList + ", foreignKeyList " + foreignKeyList + ", created " + created;
     }
 }

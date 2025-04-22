@@ -10,9 +10,11 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
+import java.util.Objects;
 
 public class DatabaseColumn {
     private final String type;
+    private final String packageName;
     private final String name;
     private final String columnName;
     private final boolean nullable;
@@ -21,9 +23,10 @@ public class DatabaseColumn {
     private final String targetClass;
     private String referencedTableName = "";
     private final boolean isPrimaryKey;
-    public DatabaseColumn(String type, String name, String columnName, boolean nullable, boolean unique,
+    public DatabaseColumn(String type, String packageName, String name, String columnName, boolean nullable, boolean unique,
                           boolean lazyFetch, String targetClass, boolean isPrimaryKey) {
         this.type = type;
+        this.packageName = packageName;
         this.name = name;
         this.columnName = columnName;
         this.nullable = nullable;
@@ -42,26 +45,26 @@ public class DatabaseColumn {
         System.out.println("DatabaseColumn: isPrimaryKey " + isPrimaryKey);*/
     }
 
-    public DatabaseColumn(String type, String name, boolean nullable, boolean unique,
+    public DatabaseColumn(String type, String packageName, String name, boolean nullable, boolean unique,
                           boolean lazyFetch, String targetClass, boolean isPrimaryKey) {
-        this(type, name, name, nullable, unique, lazyFetch, targetClass, isPrimaryKey);
+        this(type, packageName, name, name, nullable, unique, lazyFetch, targetClass, isPrimaryKey);
     }
 
 
-    public DatabaseColumn(String type, String name, String columnName, boolean nullable, boolean unique, boolean isPrimaryKey) {
-        this(type, name, columnName, nullable, unique, false, "void", isPrimaryKey);
+    public DatabaseColumn(String type, String packageName, String name, String columnName, boolean nullable, boolean unique, boolean isPrimaryKey) {
+        this(type, packageName, name, columnName, nullable, unique, false, "void", isPrimaryKey);
     }
 
-    public DatabaseColumn(String type, String name, boolean nullable, boolean unique, boolean isPrimaryKey) {
-        this(type, name, name, nullable, unique, false, "void", isPrimaryKey);
+    public DatabaseColumn(String type, String packageName, String name, boolean nullable, boolean unique, boolean isPrimaryKey) {
+        this(type, packageName, name, name, nullable, unique, false, "void", isPrimaryKey);
     }
 
-    public DatabaseColumn(String type, String name, Column columnAnnotation, boolean isPrimaryKey) {
-        this(type, name, columnAnnotation.name(), columnAnnotation.nullable(), columnAnnotation.unique(), columnAnnotation.lazyFetch(), getTargetClass(columnAnnotation), isPrimaryKey);
+    public DatabaseColumn(String type, String packageName, String name, Column columnAnnotation, boolean isPrimaryKey) {
+        this(type, packageName, name, columnAnnotation.name(), columnAnnotation.nullable(), columnAnnotation.unique(), columnAnnotation.lazyFetch(), getTargetClass(columnAnnotation), isPrimaryKey);
     }
 
-    public DatabaseColumn(String type, String name, Column columnAnnotation, String referencedTableName, boolean isPrimaryKey) {
-        this(type, name, columnAnnotation.name(), columnAnnotation.nullable(), columnAnnotation.unique(), columnAnnotation.lazyFetch(), getTargetClass(columnAnnotation), isPrimaryKey);
+    public DatabaseColumn(String type, String packageName, String name, Column columnAnnotation, String referencedTableName, boolean isPrimaryKey) {
+        this(type, packageName, name, columnAnnotation.name(), columnAnnotation.nullable(), columnAnnotation.unique(), columnAnnotation.lazyFetch(), getTargetClass(columnAnnotation), isPrimaryKey);
         this.referencedTableName = referencedTableName;
         if(referencedTableName != null && !referencedTableName.isEmpty()) {
             System.out.println();
@@ -110,7 +113,7 @@ public class DatabaseColumn {
 
     public String getTargetClass() {
         if(targetClass.contains("void")){
-            return name.substring(0, 1).toUpperCase() + name.substring(1);
+            return type.substring(0, 1).toUpperCase() + type.substring(1);
         }
         return targetClass.substring(targetClass.lastIndexOf('.') + 1);
     }
@@ -137,16 +140,24 @@ public class DatabaseColumn {
         String pkName = "id";
         String SQLAlias = "id";
         String resolvedReferencedTableName = "";
+        TypeElement targetClassElement = null;
+        if(targetClass.contains("void")){
+            targetClassElement = processingEnv
+                    .getElementUtils()
+                    .getTypeElement(packageName + "." + type.substring(0, 1).toUpperCase() + type.substring(1));
+            System.out.println("DatabaseColumn - getForeignKey: targetClass = " + packageName + "." + type.substring(0, 1).toUpperCase() + type.substring(1));
+        } else {
+            targetClassElement = processingEnv
+                    .getElementUtils()
+                    .getTypeElement(targetClass);
+            System.out.println("DatabaseColumn - getForeignKey: targetClass = " + targetClass);
+        }
 
-        TypeElement targetClassElement = processingEnv
-                .getElementUtils()
-                .getTypeElement(targetClass);
-
-        //System.out.println("DatabaseColumn - getForeignKey: targetClass = " + targetClass);
+        System.out.println("DatabaseColumn - getForeignKey: targetClass = " + targetClass);
+        System.out.println("DatabaseColumn - getForeignKey: targetClassElement = " + targetClassElement);
 
         if (targetClassElement != null) {
             for (Element element : targetClassElement.getEnclosedElements()) {
-                //System.out.println("DatabaseColumn - getTargetClass: element " + element);
                 if (element.getKind().isField() && element.getAnnotation(Id.class) != null) {
                     pkName = element.getSimpleName().toString();
                     Column column = element.getAnnotation(Column.class);
@@ -163,13 +174,13 @@ public class DatabaseColumn {
             }
         }
 
-        System.out.println("DatabaseColumn - referencedTableName = " + referencedTableName);
-        System.out.println("DatabaseColumn - resolvedReferencedTableName = " + resolvedReferencedTableName);
+        /*System.out.println("DatabaseColumn - referencedTableName = " + referencedTableName);
+        System.out.println("DatabaseColumn - resolvedReferencedTableName = " + resolvedReferencedTableName);*/
 
         return new FKNameEntity(name, getSQLAlias(), lazyFetch, getTargetClass(), pkName, SQLAlias, resolvedReferencedTableName);
     }
 
-    private static String getTargetClass (Column columnAnnotation){
+    public static String getTargetClass(Column columnAnnotation){
         TypeMirror typeMirror = null;
         try {
             //System.out.println("DatabaseColumn - getTargetClass: columnAnnotation.targetClass().getSimpleName() " + columnAnnotation.targetClass().getSimpleName());

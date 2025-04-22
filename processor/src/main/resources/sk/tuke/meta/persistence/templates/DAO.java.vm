@@ -245,6 +245,8 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
         if (PK == null) {
             // only safe to cast now — it's not a proxy
             $entity.Name entity = ($entity.Name) obj;
+            System.out.println("${entity}");
+            System.out.println("${entity.IdColumn}");
             PK = entity.${entity.IdColumn.GetterName}();
         }
 

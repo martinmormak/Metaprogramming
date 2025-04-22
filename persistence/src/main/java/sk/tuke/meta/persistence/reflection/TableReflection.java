@@ -37,9 +37,9 @@ public class TableReflection {
                         throw new PersistenceException("createDatabaseColumns: More ten one primary key in table " + type.getName());
                     }
                     isPrimaryKeyPresent = true;
-                    databaseColumnsList.add(new DatabaseColumn(field.getType().getSimpleName(), field.getName(), field.getAnnotation(Column.class), true));
+                    databaseColumnsList.add(new DatabaseColumn(field.getType().getSimpleName(), field.getType().getPackageName(), field.getName(), field.getAnnotation(Column.class), true));
                 } else {
-                    databaseColumnsList.add(new DatabaseColumn(field.getType().getSimpleName(), field.getName(), field.getAnnotation(Column.class), false));
+                    databaseColumnsList.add(new DatabaseColumn(field.getType().getSimpleName(), field.getType().getPackageName(), field.getName(), field.getAnnotation(Column.class), false));
                 }
             }else {
                 System.out.println("Column " + type.getSimpleName() + " in table " + type.getName() + " is not annotated with @Column");

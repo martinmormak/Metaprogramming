@@ -3,7 +3,7 @@ package sk.tuke.meta.example;
 import sk.tuke.meta.persistence.GeneratedPersistenceManager;
 import sk.tuke.meta.persistence.PersistenceException;
 import sk.tuke.meta.persistence.PersistenceManager;
-import sk.tuke.meta.persistence.ReflectivePersistenceManager;
+import sk.tuke.meta.example.arena.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
