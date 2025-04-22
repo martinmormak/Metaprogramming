@@ -64,7 +64,8 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                         try {
                             SQLAlias = enclosed.getAnnotation(Column.class).name();
                         } catch (NullPointerException e) {
-                            SQLAlias = "";
+                            SQLAlias = "-12345" +
+                                    "";
                         }
                         if(enclosed.getAnnotation(Id.class) == null){
                             isPrimaryKey = true;
