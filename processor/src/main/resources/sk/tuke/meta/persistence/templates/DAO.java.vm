@@ -97,7 +97,7 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
             if (!checkForeignKeysExists(realObject)) {
                 throw new PersistenceException("Foreign keys doesn't exists: " + realObject);
             }
-            if (PKExist("${entity.Name}", "${entity.PrimaryKey}", PK)) {
+            if (PKExist("${entity.SQLAlias}", "${entity.PrimaryKey}", PK)) {
                 System.out.println("${entity.DaoName} ${entity.UpdateQuery}");
                 try (PreparedStatement preparedStatement = connection.prepareStatement("${entity.UpdateQuery}")) {
                     #set($i = 1)
