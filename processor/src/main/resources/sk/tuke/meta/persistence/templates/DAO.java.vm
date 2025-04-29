@@ -25,7 +25,6 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
     @Override
     public void createTable() {
         try {
-            System.out.println("${entity.DaoName} ${entity.CreateQuery}");
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "${entity.CreateQuery}");
             preparedStatement.execute();
@@ -37,7 +36,6 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
     @Override
     public Optional<$entity.Name> get(long id) {
         try {
-            System.out.println("${entity.DaoName} ${entity.SelectOneQuery}");
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "${entity.SelectOneQuery}");
             preparedStatement.setLong(1, id);
@@ -56,7 +54,6 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
     public List<$entity.Name> getAll() {
         List<$entity.Name> instances = new ArrayList<>();
         try {
-            System.out.println("${entity.DaoName} ${entity.SelectAllQuery}");
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "${entity.SelectAllQuery}");
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -74,16 +71,12 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
     public void save(Object entity) {
         $entity.Name realObject = null;
         if (Proxy.isProxyClass(entity.getClass())) {
-            System.out.println("$entity.DaoName save: entity was proxy");
             InvocationHandler handler = Proxy.getInvocationHandler(entity);
 
             if (handler instanceof LazyProxyHandler lazyHandler) {
-                System.out.println("$entity.DaoName save: proxy is LazyProxyHandler");
                 if (!lazyHandler.isInitialized()) {
-                    System.out.println("$entity.DaoName save: proxy is unitialized");
                     return;
                 }
-                System.out.println("$entity.DaoName save: proxy is itialized");
                 realObject = ($entity.Name) lazyHandler.getRealObject();
             }
         }
@@ -98,7 +91,6 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                 throw new PersistenceException("Foreign keys doesn't exists: " + realObject);
             }
             if (PKExist("${entity.SQLAlias}", "${entity.PrimaryKey}", PK)) {
-                System.out.println("${entity.DaoName} ${entity.UpdateQuery}");
                 try (PreparedStatement preparedStatement = connection.prepareStatement("${entity.UpdateQuery}")) {
                     #set($i = 1)
                     #foreach ($column in $entity.DatabaseColumnsList)
@@ -123,17 +115,13 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                                     #if($fk.SQLAlias.contains($columnName) || $fk.JavaName.contains($columnName))
                     id = null;
                     if (Proxy.isProxyClass(entity.getClass())) {
-                        System.out.println("$entity.DaoName update: entity was proxy");
                         InvocationHandler handler = Proxy.getInvocationHandler(entity);
 
                         if (handler instanceof LazyProxyHandler<?>) {
-                            System.out.println("$entity.DaoName update: proxy is LazyProxyHandler");
                             LazyProxyHandler lazyHandler = (LazyProxyHandler) handler;
                             if (!lazyHandler.isInitialized()) {
-                                System.out.println("$entity.DaoName update: proxy is unitialized");
                                 throw new PersistenceException("Proxy is not initialized " + entity);
                             }
-                            System.out.println("$entity.DaoName update: proxy is itialized");
                             id = lazyHandler.getId();
                         }
                     }
@@ -160,7 +148,6 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                     preparedStatement.executeUpdate();
                 }
             } else {
-                System.out.println("${entity.DaoName} ${entity.InsertQuery}");
                 try (PreparedStatement preparedStatement = connection.prepareStatement("${entity.InsertQuery}", Statement.RETURN_GENERATED_KEYS)) {
                     #set($i = 1)
                     #foreach ($column in $entity.DatabaseColumnsList)
@@ -168,8 +155,6 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                         #set($columnName = $column.Name)
                         #set($methodSuffix = $columnName.substring(0, 1).toUpperCase() + $columnName.substring(1))
                         #if ($columnName != $entity.IdColumn.Name)
-                            System.out.println("$column.Name");
-                            System.out.println("$shortType");
                             #if ($shortType == "class java.lang.String" || $shortType == "String")
                     preparedStatement.setString($i, realObject.get${methodSuffix}());
                             #elseif ($shortType == "class java.lang.Long" || $shortType == "long")
@@ -185,17 +170,13 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                                     #if($fk.SQLAlias.contains($columnName) || $fk.JavaName.contains($columnName))
                     id = null;
                     if (Proxy.isProxyClass(entity.getClass())) {
-                        System.out.println("$entity.DaoName insert: entity was proxy");
                         InvocationHandler handler = Proxy.getInvocationHandler(entity);
 
                         if (handler instanceof LazyProxyHandler<?>) {
-                            System.out.println("$entity.DaoName save: proxy is LazyProxyHandler");
                             LazyProxyHandler lazyHandler = (LazyProxyHandler) handler;
                             if (!lazyHandler.isInitialized()) {
-                                System.out.println("$entity.DaoName save: proxy is unitialized");
                                 throw new PersistenceException("Proxu is not initialized " + entity);
                             }
-                            System.out.println("$entity.DaoName save: proxy is itialized");
                             id = lazyHandler.getId();
                         }
                     }
@@ -233,11 +214,9 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
         Object PK = null;
 
         if (Proxy.isProxyClass(obj.getClass())) {
-            System.out.println("$entity.DaoName delete: entity was proxy");
             InvocationHandler handler = Proxy.getInvocationHandler(obj);
 
             if (handler instanceof LazyProxyHandler lazyHandler) {
-                System.out.println("$entity.DaoName delete: proxy is LazyProxyHandler");
                 PK = lazyHandler.getId();
             }
         }
@@ -245,12 +224,9 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
         if (PK == null) {
             // only safe to cast now — it's not a proxy
             $entity.Name entity = ($entity.Name) obj;
-            System.out.println("${entity}");
-            System.out.println("${entity.IdColumn}");
             PK = entity.${entity.IdColumn.GetterName}();
         }
 
-        System.out.println("${entity.DaoName} $entity.DeleteQuery");
         try (PreparedStatement preparedStatement = connection.prepareStatement("$entity.DeleteQuery")) {
             preparedStatement.setObject(1, PK);
             int affectedRows = preparedStatement.executeUpdate();
@@ -297,10 +273,6 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
                         #if (${lazyFetch})
             // Vytvorenie proxy na oneskorené načítanie
             foreignKeyId = resultSet.getLong("$SQLAlias");
-            /*System.out.println("$entity.DaoName getInstanceFromDatabase: methodSuffix ${methodSuffix}");
-            System.out.println("$entity.DaoName getInstanceFromDatabase: column.TargetClass ${column.TargetClass}");
-            System.out.println("$entity.DaoName getInstanceFromDatabase: foreignKeyId ${foreignKeyId}");
-            System.out.println("$entity.DaoName getInstanceFromDatabase: daoPersistenceManager ${daoPersistenceManager}");*/
             instance.set${methodSuffix}((${column.TypeString}) LazyProxyHandler.createProxy(
                 ${column.TypeString}.class,
                 ${column.TargetClass}.class,
@@ -332,17 +304,13 @@ public class $entity.DaoName implements EntityDAO<$entity.Name> {
         // TODO: this must use note entity but use field
         PK = null;
         if (Proxy.isProxyClass(entity.getClass())) {
-            System.out.println("$entity.DaoName checkForeignKeysExists: entity was proxy");
             InvocationHandler handler = Proxy.getInvocationHandler(entity);
 
             if (handler instanceof LazyProxyHandler lazyHandler) {
-                System.out.println("$entity.DaoName checkForeignKeysExists: proxy is LazyProxyHandler");
 
                 if (!lazyHandler.isInitialized()) {
-                    System.out.println("$entity.DaoName checkForeignKeysExists: proxy is unitialized");
                     throw new PersistenceException("Proxu is not initialized " + entity);
                 }
-                System.out.println("$entity.DaoName checkForeignKeysExists: proxy is itialized");
 
                 PK = lazyHandler.getId();
             }

@@ -95,6 +95,9 @@ public class ArenaMain {
         renamedTable.setNumber(99);
         manager.save(renamedTable);
 
+        renamedTable.setNumber(1);
+        manager.save(renamedTable);
+
         Simple simple = new Simple();
         simple.setText("Simple Text");
         simple.setNumber(11);

@@ -34,15 +34,6 @@ public class DatabaseColumn {
         this.lazyFetch = lazyFetch;
         this.targetClass = targetClass;
         this.isPrimaryKey = isPrimaryKey;
-        /*System.out.println();
-        System.out.println("DatabaseColumn: type " + type);
-        System.out.println("DatabaseColumn: name " + name);
-        System.out.println("DatabaseColumn: columnName " + columnName);
-        System.out.println("DatabaseColumn: nullable " + nullable);
-        System.out.println("DatabaseColumn: unique " + unique);
-        System.out.println("DatabaseColumn: lazyFetch " + lazyFetch);
-        System.out.println("DatabaseColumn: targetClass " + targetClass);
-        System.out.println("DatabaseColumn: isPrimaryKey " + isPrimaryKey);*/
     }
 
     public DatabaseColumn(String type, String packageName, String name, boolean nullable, boolean unique,
@@ -66,18 +57,6 @@ public class DatabaseColumn {
     public DatabaseColumn(String type, String packageName, String name, Column columnAnnotation, String referencedTableName, boolean isPrimaryKey) {
         this(type, packageName, name, columnAnnotation.name(), columnAnnotation.nullable(), columnAnnotation.unique(), columnAnnotation.lazyFetch(), getTargetClass(columnAnnotation), isPrimaryKey);
         this.referencedTableName = referencedTableName;
-        if(referencedTableName != null && !referencedTableName.isEmpty()) {
-            System.out.println();
-            System.out.println("DatabaseColumn: type " + type);
-            System.out.println("DatabaseColumn: name " + name);
-            System.out.println("DatabaseColumn: columnName " + columnName);
-            System.out.println("DatabaseColumn: nullable " + nullable);
-            System.out.println("DatabaseColumn: unique " + unique);
-            System.out.println("DatabaseColumn: lazyFetch " + lazyFetch);
-            System.out.println("DatabaseColumn: targetClass " + targetClass);
-            System.out.println("DatabaseColumn: isPrimaryKey " + isPrimaryKey);
-            System.out.println("DatabaseColumn: referencedTableName " + referencedTableName);
-        }
     }
 
     public Class<?> getType() {
@@ -127,15 +106,6 @@ public class DatabaseColumn {
     }
 
     public FKNameEntity getForeignKey(ProcessingEnvironment processingEnv) {
-        /*System.out.println();
-        System.out.println("DatabaseColumn - getForeignKey: type " + type);
-        System.out.println("DatabaseColumn - getForeignKey: name " + name);
-        System.out.println("DatabaseColumn - getForeignKey: columnName " + columnName);
-        System.out.println("DatabaseColumn - getForeignKey: nullable " + nullable);
-        System.out.println("DatabaseColumn - getForeignKey: unique " + unique);
-        System.out.println("DatabaseColumn - getForeignKey: lazyFetch " + lazyFetch);
-        System.out.println("DatabaseColumn - getForeignKey: targetClass " + targetClass);
-        System.out.println("DatabaseColumn - getForeignKey: isPrimaryKey " + isPrimaryKey);*/
 
         String pkName = "id";
         String SQLAlias = "id";
@@ -145,16 +115,11 @@ public class DatabaseColumn {
             targetClassElement = processingEnv
                     .getElementUtils()
                     .getTypeElement(packageName + "." + type.substring(0, 1).toUpperCase() + type.substring(1));
-            System.out.println("DatabaseColumn - getForeignKey: targetClass = " + packageName + "." + type.substring(0, 1).toUpperCase() + type.substring(1));
         } else {
             targetClassElement = processingEnv
                     .getElementUtils()
                     .getTypeElement(targetClass);
-            System.out.println("DatabaseColumn - getForeignKey: targetClass = " + targetClass);
         }
-
-        System.out.println("DatabaseColumn - getForeignKey: targetClass = " + targetClass);
-        System.out.println("DatabaseColumn - getForeignKey: targetClassElement = " + targetClassElement);
 
         if (targetClassElement != null) {
             for (Element element : targetClassElement.getEnclosedElements()) {
@@ -174,20 +139,14 @@ public class DatabaseColumn {
             }
         }
 
-        /*System.out.println("DatabaseColumn - referencedTableName = " + referencedTableName);
-        System.out.println("DatabaseColumn - resolvedReferencedTableName = " + resolvedReferencedTableName);*/
-
         return new FKNameEntity(name, getSQLAlias(), lazyFetch, getTargetClass(), pkName, SQLAlias, resolvedReferencedTableName);
     }
 
     public static String getTargetClass(Column columnAnnotation){
         TypeMirror typeMirror = null;
         try {
-            //System.out.println("DatabaseColumn - getTargetClass: columnAnnotation.targetClass().getSimpleName() " + columnAnnotation.targetClass().getSimpleName());
             return columnAnnotation.targetClass().getSimpleName(); // This triggers MirroredTypeException
         } catch (MirroredTypeException e) {
-            //System.out.println("DatabaseColumn - getTargetClass: e " + e);
-            //System.out.println("DatabaseColumn - getTargetClass: e.getTypeMirror() " + e.getTypeMirror());
             typeMirror = e.getTypeMirror(); // Correct way to get the TypeMirror
         }
         return typeMirror.toString();

@@ -47,52 +47,6 @@ public class TableAnnotationProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnvironment) {
-        for (Element element : roundEnvironment.getElementsAnnotatedWith(Table.class)) {
-            if (element.getKind() == ElementKind.CLASS) {
-                TypeElement classElement = (TypeElement) element;
-
-                // Print class name (fully qualified)
-                String className = processingEnv.getElementUtils().getBinaryName(classElement).toString();
-                String SQLAlias = element.getAnnotation(Table.class).name();
-                System.out.println("Class: " + className + ", SQLAlias: " + SQLAlias);
-
-                // Print all fields
-                for (Element enclosed : classElement.getEnclosedElements()) {
-                    if (enclosed.getKind() == ElementKind.FIELD) {
-                        VariableElement field = (VariableElement) enclosed;
-                        String fieldName = field.getSimpleName().toString();
-                        String fieldType = field.asType().toString();
-                        boolean isPrimaryKey = false;
-                        try {
-                            SQLAlias = enclosed.getAnnotation(Column.class).name();
-                        } catch (NullPointerException e) {
-                            SQLAlias = "-12345";
-                        }
-                        if(enclosed.getAnnotation(Id.class) == null){
-                            isPrimaryKey = true;
-                        }
-
-                        System.out.println("  Field: " + fieldType + " " + fieldName + ", " + SQLAlias + ", " + isPrimaryKey);
-                    }
-                }
-
-                // Methods
-                for (Element enclosed : classElement.getEnclosedElements()) {
-                    if (enclosed.getKind() == ElementKind.METHOD) {
-                        ExecutableElement method = (ExecutableElement) enclosed;
-                        String methodName = method.getSimpleName().toString();
-                        String returnType = method.getReturnType().toString();
-
-                        List<? extends VariableElement> parameters = method.getParameters();
-                        String paramList = parameters.stream()
-                                .map(p -> p.asType().toString() + " " + p.getSimpleName())
-                                .collect(Collectors.joining(", "));
-
-                        System.out.println("  Method: " + returnType + " " + methodName + "(" + paramList + ")");
-                    }
-                }
-            }
-        }
         var tableElements = roundEnvironment.getElementsAnnotatedWith(Table.class);
         List<DatabaseTable> entities = analyzeEntities(tableElements);
         for (var entity : entities) {
@@ -215,7 +169,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
             databaseColumns.add(databaseColumn);
             if(isFK){
                 foreignKeyList.add(databaseColumn.getForeignKey(processingEnv));
-                System.out.println("TableAnnotationProcessor - getColumnList: foreignKeyList " + foreignKeyList.get(foreignKeyList.size()-1).toString());
+                //System.out.println("TableAnnotationProcessor - getColumnList: foreignKeyList " + foreignKeyList.get(foreignKeyList.size()-1).toString());
             }
         }
     }
